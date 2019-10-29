@@ -36,6 +36,7 @@ numericrange_input <- function(ns, self){
   do.call(shinyWidgets::numericRangeInput, options)
 }
 
+
 select_input <- function(ns, self, type = c("select","picker")){
   
   type <- match.arg(type)

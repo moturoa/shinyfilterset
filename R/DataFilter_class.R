@@ -18,11 +18,16 @@ data_filter_set <- function(..., id = NULL){
   
 }
 
+#' @param id
+#' @param filter_ui
+#' @param sort
+#' @param options
 #' @rdname data_filter_set
 #' @export
 data_filter <- function(id = NULL, column_data, column_name, 
                         filter_ui = c("picker","select","numeric_min","slider",
                                       "numeric_max","numeric_range","switch"), 
+                        sort = TRUE,
                         options = list()){
   
   filter_ui <- match.arg(filter_ui)
@@ -132,6 +137,7 @@ DataFilter <- R6Class(
                           column_data = NULL, 
                           column_name, 
                           filter_ui,
+                          sort = TRUE,
                           options = list()){
 
       self$id <- id
@@ -144,7 +150,7 @@ DataFilter <- R6Class(
           column_data <- as.character(column_data)
         }
         self$unique <- unique(column_data)
-        if("sort" %in% names(options) && options$sort){
+        if(sort){
           self$unique <- sort(self$unique)
         }
         

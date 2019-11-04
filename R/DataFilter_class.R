@@ -5,9 +5,9 @@
 #' @details
 #' @examples
 #' @export
-#' @rdname data_filter_set
+#' @rdname datafilterset
 #' @importFrom R6 R6Class
-data_filter_set <- function(..., id = NULL){
+shinyfilterset <- function(..., id = NULL){
   
   if(is.null(id)){
     id <- UUIDgenerate()
@@ -15,14 +15,14 @@ data_filter_set <- function(..., id = NULL){
   
   DataFilterSet$new(..., id = id)
   
-  
 }
 
+#' Make a data filter for use in shinyfilterset
 #' @param id
 #' @param filter_ui
 #' @param sort
 #' @param options
-#' @rdname data_filter_set
+#' @rdname datafilterset
 #' @export
 data_filter <- function(id = NULL, column_data, column_name, 
                         filter_ui = c("picker","select","numeric_min","slider",
@@ -51,7 +51,6 @@ DataFilterSet <- R6::R6Class(
     id = NULL,
     elements = NULL,
     filters = NULL,
-    last_used = NULL,  # not used; for future release including self-updating filters
     initialize = function(..., id){
       
       self$id <- id
@@ -79,29 +78,25 @@ DataFilterSet <- R6::R6Class(
       )
       
     },
+    
     apply = function(data){
         callModule(private$module_server, self$id,
                    data = data,
                    filters = self$filters)
     },
+    
     reactive = function(input){
       lapply(self$filters, function(x)input[[x$id]])
     },
+    
     get_value = function(input, name){
       
       ns <- NS(self$id)
-      id <- paste0(ns(self$filters[[name]]$id), "-input_element")
+      id <- private$get_filter_id(name)
       input[[id]]
       
-    },
-    update = function(session, name, choices){
-      
-      #!!!
-      #updateSelectInput(session, private$get_filter_id(name), choices = choices)
-      
-      #self$filters[[name]]$update(ns = NS(self$id), session = session, choices = choices)
-      
     }
+    
   ),
   
   private = list(
@@ -125,14 +120,21 @@ DataFilterSet <- R6::R6Class(
 
 
 # Class definition: a single filter.
+# Not used by user!
 DataFilter <- R6Class(
   public = list(
+    
     id = NULL,
+    ns_id = NULL,
     column_name = NULL,
     unique = NULL,
     range = NULL,
     filter_ui = NULL,
     options = NULL,
+    input_function = NULL,
+    update_function = NULL,
+    
+    # DataFilter$new()
     initialize = function(id, 
                           column_data = NULL, 
                           column_name, 
@@ -163,16 +165,51 @@ DataFilter <- R6Class(
         self$range <- NULL
       }
       
+      # Register the actual function used to make the input field
+      # --> input_wrappers need to be rearranged, some duplication here
+      self$input_function <- switch(self$filter_ui, 
+                                    slider = "shiny::sliderInput",
+                                    select = "shiny::selectInput",
+                                    picker = "shinyWidgets::pickerInput",
+                                    numeric_min = "shiny::numericInput",
+                                    numeric_max = "shiny::numericInput",
+                                    numeric_range = "shinyWidgets::numericRangeInput",
+                                    switch = "shinyWidgets::materialSwitch"
+                                    )
+      
+      # register the function that can be used to update the input field
+      self$update_function <- switch(self$input_function,
+                                     "shiny::sliderInput" = update_slider,
+                                     "shiny::selectInput" = "shiny::updateSelectInput",
+                                     "shinyWidgets::pickerInput" = "shinyWidgets::updatePickerInput",
+                                     "shiny::numericInput" = "shiny::updateNumericInput",
+                                     "shinyWidgets::numericRangeInput" = "shinyWidgets::updatenNumericRangeInput",
+                                     "shinyWidgets::materialSwitch" = "shinyWidgets::updateMaterialSwitch"
+                                     )
+      
     },
+    
+    #----- Methods
+    update = function(session, data){
+
+      datavector <- data[[self$column_name]]
+      do.call(self$update_function,
+              list(session = session, self = self, datavector)
+      )
+
+    },
+    
     apply = function(data){
       callModule(private$module_server, self$id,
                  data = data,
                  column_name = self$column_name)
     },
+    
     ui = function(ns = NS(NULL)){
       
       # https://stackoverflow.com/questions/46693161/wrapping-shiny-modules-in-r6-classes
       ns <- NS(ns(self$id))
+      self$ns_id <- ns("input_element")
       
       switch(self$filter_ui, 
              
@@ -183,6 +220,7 @@ DataFilter <- R6Class(
              numeric_max = numeric_input(ns, self, "max"),
              numeric_range = numericrange_input(ns, self),
              switch = binary_input(ns, self, type = "switch")
+             
       )
       
     }
@@ -200,15 +238,19 @@ DataFilter <- R6Class(
                               !!sym(column_name) >= input$input_element[1],
                               !!sym(column_name) <= input$input_element[2])
       }
+      
       if(self$filter_ui %in% c("select","picker")){
         data <- dplyr::filter(data, !!sym(column_name) %in% input$input_element)
       }
+      
       if(self$filter_ui == "numeric_min"){
         data <- dplyr::filter(data, !!sym(column_name) >= input$input_element)
       }
+      
       if(self$filter_ui == "numeric_max"){
         data <- dplyr::filter(data, !!sym(column_name) <= input$input_element)
       }
+      
       if(self$filter_ui == "switch"){
         
         # If the switch is OFF (FALSE), don't filter. Only filter the TRUE values if the switch is ON.

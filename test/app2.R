@@ -10,7 +10,7 @@ set.seed(1)
 mtcars$binary1 <- sample(c(TRUE,FALSE),nrow(mtcars),replace=TRUE)
 mtcars$binary2 <- sample(c(TRUE,FALSE),nrow(mtcars),replace=TRUE)
 
-my_filters <- data_filter_set(
+my_filters <- shinyfilterset(
   tags$h4("Filters"),
   data_filter(column_data = mtcars$drat, column_name = "drat", filter_ui = "slider", 
               options = list(label = "Select drat value", ticks = FALSE)),
@@ -20,24 +20,28 @@ my_filters <- data_filter_set(
               options = list(label = "Select gear")),
   data_filter(column_data = mtcars$cyl, column_name = "cyl", filter_ui = "numeric_min",
               options = list(label = "Select cyl")),
-  tags$hr(),
-  data_filter(column_name = "binary1", filter_ui = "switch", options = list(status = "primary"))
+  data_filter(column_name = "binary1", filter_ui = "switch", options = list(status = "primary")),
+  tags$hr()
 )
 
 
 ui <- fluidPage(
   useShinyjs(),
   
-  uiOutput("div_my_filters"),
-  
-  actionButton("hide_filters", "Toggle", 
-               icon = icon("sort", lib = "glyphicon"), class = "btn btn-primary"),
-  actionButton("reset_filters", "Reset", 
-               icon = icon("refresh", lib = "glyphicon"), class = "btn btn-primary"),
+  fluidRow(
+    column(6, uiOutput("div_my_filters")),
+    column(6, 
+           actionButton("hide_filters", "Toggle", 
+                           icon = icon("sort", lib = "glyphicon"), class = "btn btn-primary"),
+           actionButton("reset_filters", "Reset", 
+                        icon = icon("refresh", lib = "glyphicon"), class = "btn btn-primary"),
+           
+           actionButton("updateslider", "Update")
+           )
+  ),
   
   tags$hr(),
-  dataTableOutput("data_out"),
-  actionButton("test", "Test")
+  uiOutput("data_out")
 )
 
 server <- function(input, output, session){ 
@@ -56,13 +60,16 @@ server <- function(input, output, session){
     rv$data_filtered <- my_filters$apply(mtcars)
   })
   
-  output$data_out <- renderDataTable({
-    datatable(rv$data_filtered)
+  observeEvent(input$updateslider, {
+    my_filters$filters[[1]]$update(session, rv$data_filtered)
   })
   
-  observeEvent(input$test,  {
+  output$data_out <- renderUI({
     
-    #my_filters$update(session, "gear", choices = 1:10)
+    tagList(  
+      tags$span(nrow(rv$data_filtered), style = "font-size: 10em;"),
+      tags$span(" rijen", style = "font-size: 2em;")
+    )
     
   })
   

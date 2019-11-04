@@ -5,12 +5,12 @@ slider_input <- function(ns, self){
   
   options <- self$options
   
-  if(!("label" %in% names(options))){
-    options$label <- self$column_name
-  }
   if(!("value" %in% names(options))){
     options$value <- self$range
   }
+  
+  options$label <- self$label
+  
   options <- c(list(inputId = ns("input_element")), 
                options, 
                list(min = self$range[1], max = self$range[2]))
@@ -23,12 +23,11 @@ numericrange_input <- function(ns, self){
   
   options <- self$options
   
-  if(!("label" %in% names(options))){
-    options$label <- self$column_name
-  }
   if(!("value" %in% names(options))){
     options$value <- self$range
   }
+  
+  options$label <- self$label
   
   options <- c(list(inputId = ns("input_element")), 
                options)
@@ -47,15 +46,15 @@ select_input <- function(ns, self, type = c("select","picker")){
   
   options <- self$options
   
-  if(!("label" %in% names(options))){
-    options$label <- self$column_name
-  }
   if(!("selected" %in% names(options))){
     options$selected <- self$unique
   }
   if(!("multiple" %in% names(options))){
     options$multiple <- TRUE
   }
+  
+  options$label <- self$label
+  
   options <- c(list(inputId = ns("input_element")), 
                options, 
                list(choices = self$unique))
@@ -72,12 +71,12 @@ numeric_input <- function(ns, self, type = c("min", "max")){
                        max = 2)
   options <- self$options
   
-  if(!("label" %in% names(options))){
-    options$label <- self$column_name
-  }
   if(!("value" %in% names(options))){
     options$value <- self$range[type_index]
   }
+  
+  options$label <- self$label
+  
   options <- c(list(inputId = ns("input_element")), 
                options, 
                list(min = self$range[1], max = self$range[2]))
@@ -91,13 +90,11 @@ binary_input <- function(ns, self, type = "switch"){
   options <- self$options
   type <- match.arg(type)
   
-  if(!("label" %in% names(options))){
-    options$label <- self$column_name
-  }
-
   if(!("value" %in% names(options))){
     options$value <- FALSE
   }
+  
+  options$label <- self$label
   
   options <- c(list(inputId = ns("input_element")), 
                options)

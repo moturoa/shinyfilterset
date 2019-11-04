@@ -31,6 +31,8 @@ ui <- fluidPage(
   fluidRow(
     column(6, uiOutput("div_my_filters")),
     column(6, 
+           tags$br(),
+           tags$br(),
            actionButton("hide_filters", "Toggle", 
                            icon = icon("sort", lib = "glyphicon"), class = "btn btn-primary"),
            actionButton("reset_filters", "Reset", 
@@ -61,7 +63,8 @@ server <- function(input, output, session){
   })
   
   observeEvent(input$updateslider, {
-    my_filters$filters[[1]]$update(session, rv$data_filtered)
+    #my_filters$filters[[1]]$update(session, rv$data_filtered)
+    my_filters$update(session, rv$data_filtered, input)
   })
   
   output$data_out <- renderUI({

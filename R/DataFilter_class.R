@@ -85,6 +85,12 @@ DataFilterSet <- R6::R6Class(
                    filters = self$filters)
     },
     
+    update = function(session, data, input){
+      
+      lapply(self$filters, function(x)x$update(session, data, input))
+      
+    },
+    
     reactive = function(input){
       lapply(self$filters, function(x)input[[x$id]])
     },
@@ -127,6 +133,7 @@ DataFilter <- R6Class(
     id = NULL,
     ns_id = NULL,
     column_name = NULL,
+    label = NULL,
     unique = NULL,
     range = NULL,
     filter_ui = NULL,
@@ -144,6 +151,13 @@ DataFilter <- R6Class(
 
       self$id <- id
       self$column_name <- column_name
+      
+      if(!("label" %in% names(options))){
+        self$label <- self$column_name
+      } else {
+        self$label <- options$label
+      }
+      
       self$options <- options
       self$filter_ui <- filter_ui
       
@@ -166,7 +180,7 @@ DataFilter <- R6Class(
       }
       
       # Register the actual function used to make the input field
-      # --> input_wrappers need to be rearranged, some duplication here
+      # not used
       self$input_function <- switch(self$filter_ui, 
                                     slider = "shiny::sliderInput",
                                     select = "shiny::selectInput",
@@ -178,23 +192,24 @@ DataFilter <- R6Class(
                                     )
       
       # register the function that can be used to update the input field
-      self$update_function <- switch(self$input_function,
-                                     "shiny::sliderInput" = update_slider,
-                                     "shiny::selectInput" = "shiny::updateSelectInput",
-                                     "shinyWidgets::pickerInput" = "shinyWidgets::updatePickerInput",
-                                     "shiny::numericInput" = "shiny::updateNumericInput",
-                                     "shinyWidgets::numericRangeInput" = "shinyWidgets::updatenNumericRangeInput",
-                                     "shinyWidgets::materialSwitch" = "shinyWidgets::updateMaterialSwitch"
+      self$update_function <- switch(self$filter_ui,
+                                     slider = update_slider,
+                                     select = update_select,
+                                     picker = update_picker,
+                                     numeric_min = update_numeric_min,
+                                     numeric_max = update_numeric_max,
+                                     numeric_range = update_range,
+                                     switch = update_material
                                      )
       
     },
     
     #----- Methods
-    update = function(session, data){
+    update = function(session, data, input){
 
       datavector <- data[[self$column_name]]
       do.call(self$update_function,
-              list(session = session, self = self, datavector)
+              list(session = session, self = self, data = datavector, input = input)
       )
 
     },

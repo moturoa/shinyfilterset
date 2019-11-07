@@ -60,8 +60,9 @@ server <- function(input, output, session){
   observe({
     my_filters$reactive(input)
     rv$data_filtered <- my_filters$apply(mtcars)
+    my_filters$update(session, rv$data_filtered, input)
   })
-  
+   
   observeEvent(input$updateslider, {
     #my_filters$filters[[1]]$update(session, rv$data_filtered)
     my_filters$update(session, rv$data_filtered, input)

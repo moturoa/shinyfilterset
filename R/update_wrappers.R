@@ -16,8 +16,13 @@ update_select <- function(session, self, data, input){
   
   val <- unique(data)
   
-  # !! not a bug (?), but you have to set selected when updating the choices
-  updateSelectInput(session, self$ns_id, choices = val, selected = input[[self$ns_id]])
+  # !! not a bug (?), but you have to set `selected` when updating the choices
+  if(!is.null(self$ns_id)){
+    oldval <- input[[self$ns_id]]
+    if(!is.null(oldval)){
+      updateSelectInput(session, self$ns_id, choices = val, selected = oldval)
+    }
+  }
   
 }
 

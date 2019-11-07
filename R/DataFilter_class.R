@@ -2,7 +2,13 @@
 #' @description An R6 class to define a 'filter set', a collection of ui elements (sliders, pickers, etc.) 
 #' to filter a dataset, for use in shiny applications.
 #' @param \dots The filters, or HTML elements. Define filters with \code{data_filter}, see Examples.
-#' @details
+#' @details This function makes a shinyfilterset objects, which has a number of methods and properties. 
+#' id, elements, filters
+#' ui(), apply(), reactive(), update()
+#' The shinyfilterset is made up of \code{data_filter} objects, and optionally as many HTML tags as you 
+#' like, for layout purposes.  These have to be constructed with \code{shiny::tags} (see Examples).
+#' Each data filter has properties and methods of its own, most of which don't need to be called directly
+#' by the user.
 #' @examples
 #' @export
 #' @rdname datafilterset
@@ -208,10 +214,11 @@ DataFilter <- R6Class(
     update = function(session, data, input){
 
       datavector <- data[[self$column_name]]
-      do.call(self$update_function,
-              list(session = session, self = self, data = datavector, input = input)
-      )
-
+      if(!is.null(datavector)){
+        do.call(self$update_function,
+                list(session = session, self = self, data = datavector, input = input)
+        )
+      }
     },
     
     apply = function(data){

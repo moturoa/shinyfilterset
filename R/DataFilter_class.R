@@ -41,9 +41,11 @@ data_filter <- function(id = NULL,
                         updates = FALSE,
                         sort = TRUE,
                         all_choice = NULL,
+                        search_method = c("equal","regex"),
                         options = list()){
   
   filter_ui <- match.arg(filter_ui)
+  search_method <- match.arg(search_method)
   
   if(is.null(id)){
     id <- UUIDgenerate()
@@ -56,6 +58,7 @@ data_filter <- function(id = NULL,
                  filter_ui = filter_ui,
                  updates = updates,
                  all_choice = all_choice,
+                 search_method = search_method,
                  options = options)
 
 }
@@ -155,6 +158,7 @@ DataFilter <- R6Class(
     column_name = NULL,
     updates = NULL,
     all_choice = NULL,
+    search_method = NULL,
     label = NULL,
     unique = NULL,
     range = NULL,
@@ -172,12 +176,14 @@ DataFilter <- R6Class(
                           updates = NULL,
                           sort = TRUE,
                           all_choice = NULL,
+                          search_method = NULL,
                           options = list()){
 
       self$id <- id
       self$ui_section <- ui_section
       self$column_name <- column_name
       self$all_choice <- all_choice
+      self$search_method <- search_method
       self$updates <- updates
       
       if(!("label" %in% names(options))){
@@ -292,7 +298,14 @@ DataFilter <- R6Class(
         
         if(is.null(self$all_choice) || 
            (!is.null(input$input_element) && input$input_element != self$all_choice)){
-          data <- dplyr::filter(data, !!sym(column_name) %in% input$input_element)
+          
+          if(self$search_method == "equal"){
+            data <- dplyr::filter(data, !!sym(column_name) %in% input$input_element)  
+          } else if(self$search_method == "regex"){
+            regex <- paste(input$input_element, collapse = "|")
+            data <- dplyr::filter(data, grepl(regex, !!sym(column_name)))
+          }
+          
         }
       }
       

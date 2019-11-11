@@ -10,7 +10,8 @@ shinyfilterset(..., id = NULL)
 data_filter(id = NULL, ui_section = 1, column_data, column_name,
   filter_ui = c("picker", "select", "checkboxes", "numeric_min",
   "slider", "numeric_max", "numeric_range", "switch"), updates = FALSE,
-  sort = TRUE, all_choice = NULL, options = list())
+  sort = TRUE, all_choice = NULL, search_method = c("equal",
+  "regex"), options = list())
 }
 \arguments{
 \item{\dots}{The filters, or HTML elements. Define filters with \code{data_filter}, see Examples.}

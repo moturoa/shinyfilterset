@@ -25,13 +25,15 @@ shinyfilterset <- function(..., id = NULL){
 
 #' Make a data filter for use in shinyfilterset
 #' @param id
+#' @param ui_section
 #' @param filter_ui
 #' @param sort
 #' @param options
 #' @rdname datafilterset
 #' @export
-data_filter <- function(id = NULL, column_data, column_name, 
-                        filter_ui = c("picker","select","numeric_min","slider",
+data_filter <- function(id = NULL, ui_section = 1, column_data, column_name, 
+                        filter_ui = c("picker","select","checkboxes",
+                                      "numeric_min","slider",
                                       "numeric_max","numeric_range","switch"), 
                         sort = TRUE,
                         options = list()){
@@ -43,6 +45,7 @@ data_filter <- function(id = NULL, column_data, column_name,
   }
   
   DataFilter$new(id = id,
+                 ui_section = ui_section,
                  column_data = column_data, 
                  column_name = column_name, 
                  filter_ui = filter_ui,
@@ -53,6 +56,7 @@ data_filter <- function(id = NULL, column_data, column_name,
 
 # Class definition: a set of filters.
 DataFilterSet <- R6::R6Class(
+  classname = "datafilterset",
   public = list(
     id = NULL,
     elements = NULL,
@@ -70,15 +74,17 @@ DataFilterSet <- R6::R6Class(
       
       
     },
-    ui = function(ns){
+    ui = function(ns, section = 1){
       ns <- NS(self$id)
       
       tags$div(id = self$id,
         lapply(self$elements, function(x){
           
-          switch(class(x), 
-                 R6 = x$ui(ns),
-                 shiny.tag = x)
+          if(x$ui_section == section){
+            switch(class(x), 
+                   R6 = x$ui(ns),
+                   shiny.tag = x)
+          }
           
         })
       )
@@ -138,6 +144,7 @@ DataFilter <- R6Class(
     
     id = NULL,
     ns_id = NULL,
+    ui_section = NULL,
     column_name = NULL,
     label = NULL,
     unique = NULL,
@@ -149,6 +156,7 @@ DataFilter <- R6Class(
     
     # DataFilter$new()
     initialize = function(id, 
+                          ui_section = NULL,
                           column_data = NULL, 
                           column_name, 
                           filter_ui,
@@ -156,6 +164,7 @@ DataFilter <- R6Class(
                           options = list()){
 
       self$id <- id
+      self$ui_section <- ui_section
       self$column_name <- column_name
       
       if(!("label" %in% names(options))){
@@ -167,7 +176,7 @@ DataFilter <- R6Class(
       self$options <- options
       self$filter_ui <- filter_ui
       
-      if(filter_ui %in% c("picker","select")){
+      if(filter_ui %in% c("picker","select","checkboxes")){
         if(is.factor(column_data)){
           column_data <- as.character(column_data)
         }
@@ -190,6 +199,7 @@ DataFilter <- R6Class(
       self$input_function <- switch(self$filter_ui, 
                                     slider = "shiny::sliderInput",
                                     select = "shiny::selectInput",
+                                    checkboxes = "shiny::checkboxGroupInput",
                                     picker = "shinyWidgets::pickerInput",
                                     numeric_min = "shiny::numericInput",
                                     numeric_max = "shiny::numericInput",
@@ -201,6 +211,7 @@ DataFilter <- R6Class(
       self$update_function <- switch(self$filter_ui,
                                      slider = update_slider,
                                      select = update_select,
+                                     checkboxes = update_checkboxes,
                                      picker = update_picker,
                                      numeric_min = update_numeric_min,
                                      numeric_max = update_numeric_max,
@@ -237,6 +248,7 @@ DataFilter <- R6Class(
              
              slider = slider_input(ns, self),
              select = select_input(ns, self),
+             checkboxes = checkboxes_input(ns, self),
              picker = select_input(ns, self, type = "picker"),
              numeric_min = numeric_input(ns, self, "min"),
              numeric_max = numeric_input(ns, self, "max"),
@@ -261,7 +273,7 @@ DataFilter <- R6Class(
                               !!sym(column_name) <= input$input_element[2])
       }
       
-      if(self$filter_ui %in% c("select","picker")){
+      if(self$filter_ui %in% c("select","picker","checkboxes")){
         data <- dplyr::filter(data, !!sym(column_name) %in% input$input_element)
       }
       

@@ -26,6 +26,11 @@ update_select <- function(session, self, data, input){
   
 }
 
+update_checkboxes <- function(session, self, data, input){
+  val <- unique(data)
+  shiny::updateCheckboxGroupInput(session, self$ns_id, choices = val, selected = input[[self$ns_id]])
+}
+
 update_picker <- function(session, self, data, input){
   
   val <- unique(data)

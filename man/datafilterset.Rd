@@ -7,9 +7,9 @@
 \usage{
 shinyfilterset(..., id = NULL)
 
-data_filter(id = NULL, column_data, column_name,
-  filter_ui = c("picker", "select", "numeric_min", "slider",
-  "numeric_max", "numeric_range", "switch"), sort = TRUE,
+data_filter(id = NULL, ui_section = 1, column_data, column_name,
+  filter_ui = c("picker", "select", "checkboxes", "numeric_min",
+  "slider", "numeric_max", "numeric_range", "switch"), sort = TRUE,
   options = list())
 }
 \arguments{

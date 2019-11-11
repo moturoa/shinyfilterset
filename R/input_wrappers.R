@@ -52,16 +52,41 @@ select_input <- function(ns, self, type = c("select","picker")){
   if(!("multiple" %in% names(options))){
     options$multiple <- TRUE
   }
+  if(!("choices" %in% names(options))){
+    options$choices <- self$unique
+  }
   
   options$label <- self$label
   
   options <- c(list(inputId = ns("input_element")), 
-               options, 
-               list(choices = self$unique))
+               options)
   
   do.call(input_field, options)
   
 }
+
+
+checkboxes_input <- function(ns, self){
+  
+  options <- self$options
+  
+  if(!("selected" %in% names(options))){
+    options$selected <- self$unique
+  }
+  if(!("choices" %in% names(options))){
+    options$choices <- self$unique
+  }
+  
+  options$label <- self$label
+  
+  options <- c(list(inputId = ns("input_element")), 
+               options)
+  
+  do.call(shiny::checkboxGroupInput, options)
+  
+}
+
+
 
 numeric_input <- function(ns, self, type = c("min", "max")){
   

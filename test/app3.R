@@ -12,38 +12,55 @@ mtcars$binary2 <- sample(c(TRUE,FALSE),nrow(mtcars),replace=TRUE)
 
 my_filters <- shinyfilterset(
   
-  tags$h4("Filters"),
-  data_filter(column_data = mtcars$drat, column_name = "drat", filter_ui = "slider", 
+  data_filter(ui_section = 1, 
+              column_data = mtcars$drat, 
+              column_name = "drat", 
+              filter_ui = "slider", 
               options = list(label = "Select drat value", ticks = FALSE)),
-  data_filter(column_data = mtcars$disp, column_name = "disp", filter_ui = "numeric_range", 
+  data_filter(ui_section = 1,
+              column_data = mtcars$disp, 
+              column_name = "disp", 
+              filter_ui = "numeric_range", 
               options = list(label = "Select disp value")),
-  data_filter(column_data = mtcars$gear, column_name = "gear", filter_ui = "select",
+  data_filter(ui_section = 1, 
+              column_data = mtcars$gear, 
+              column_name = "gear", 
+              filter_ui = "select",
               options = list(label = "Select gear")),
-  data_filter(column_data = mtcars$cyl, column_name = "cyl", filter_ui = "numeric_min",
+  data_filter(ui_section = 2,
+              column_data = mtcars$cyl, 
+              column_name = "cyl", 
+              filter_ui = "numeric_min",
               options = list(label = "Select cyl")),
-  data_filter(column_name = "binary1", filter_ui = "switch", options = list(status = "primary")),
-  tags$hr(),
-  data_filter(column_data = mtcars$binary2, column_name = "binary2", filter_ui = "checkboxes",
+  data_filter(ui_section = 2, 
+              column_name = "binary1", 
+              filter_ui = "switch", 
+              options = list(status = "primary")),
+  data_filter(ui_section = 2,
+              column_data = mtcars$binary2, 
+              column_name = "binary2", 
+              filter_ui = "checkboxes",
               options = list(choices = c("Ja" = TRUE, "Nee" = FALSE), selected = TRUE, inline = TRUE))
-  
 )
+
 
 
 ui <- fluidPage(
   useShinyjs(),
   
   fluidRow(
-    column(6, uiOutput("div_my_filters")),
-    column(6, 
+    column(4, uiOutput("div_my_filters_1")),
+    column(4, uiOutput("div_my_filters_2")),
+    column(4, 
            tags$br(),
            tags$br(),
            actionButton("hide_filters", "Toggle", 
-                           icon = icon("sort", lib = "glyphicon"), class = "btn btn-primary"),
+                        icon = icon("sort", lib = "glyphicon"), class = "btn btn-primary"),
            actionButton("reset_filters", "Reset", 
                         icon = icon("refresh", lib = "glyphicon"), class = "btn btn-primary"),
            
            actionButton("updateslider", "Update")
-           )
+    )
   ),
   
   tags$hr(),
@@ -58,17 +75,16 @@ server <- function(input, output, session){
   
   observe({
     input$reset_filters
-    output$div_my_filters <- renderUI(my_filters$ui())
+    output$div_my_filters_1 <- renderUI(my_filters$ui(section = 1))
+    output$div_my_filters_2 <- renderUI(my_filters$ui(section = 2))
   })
   
   observe({
     my_filters$reactive(input)
     rv$data_filtered <- my_filters$apply(mtcars)
-    my_filters$update(session, rv$data_filtered, input)
   })
-   
+  
   observeEvent(input$updateslider, {
-    #my_filters$filters[[1]]$update(session, rv$data_filtered)
     my_filters$update(session, rv$data_filtered, input)
   })
   

@@ -46,7 +46,14 @@ my_filters <- shinyfilterset(
               column_name = "binary2", 
               filter_ui = "checkboxes",
               updates = FALSE,
-              options = list(choices = c("Ja" = TRUE, "Nee" = FALSE), selected = TRUE, inline = TRUE))
+              options = list(choices = c("Ja" = TRUE, "Nee" = FALSE), selected = TRUE, inline = TRUE)),
+  data_filter(ui_section = 1, 
+              column_data = mtcars$gear, 
+              column_name = "gear", 
+              filter_ui = "select",
+              updates = FALSE,
+              all_choice = "All gears selected",
+              options = list(label = "Select gear", multiple = TRUE))
 )
 
 

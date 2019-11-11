@@ -19,6 +19,7 @@ slider_input <- function(ns, self){
   
 }
 
+
 numericrange_input <- function(ns, self){
   
   options <- self$options
@@ -47,13 +48,18 @@ select_input <- function(ns, self, type = c("select","picker")){
   options <- self$options
   
   if(!("selected" %in% names(options))){
+    
     options$selected <- self$unique
+    
+    if(!is.null(self$all_choice)){
+      options$selected <- self$all_choice
+    }
   }
   if(!("multiple" %in% names(options))){
     options$multiple <- TRUE
   }
   if(!("choices" %in% names(options))){
-    options$choices <- self$unique
+    options$choices <- c(self$all_choice, self$unique)
   }
   
   options$label <- self$label

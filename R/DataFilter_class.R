@@ -31,12 +31,16 @@ shinyfilterset <- function(..., id = NULL){
 #' @param options
 #' @rdname datafilterset
 #' @export
-data_filter <- function(id = NULL, ui_section = 1, column_data, column_name, 
+data_filter <- function(id = NULL, 
+                        ui_section = 1, 
+                        column_data, 
+                        column_name, 
                         filter_ui = c("picker","select","checkboxes",
                                       "numeric_min","slider",
                                       "numeric_max","numeric_range","switch"), 
                         updates = FALSE,
                         sort = TRUE,
+                        all_choice = NULL,
                         options = list()){
   
   filter_ui <- match.arg(filter_ui)
@@ -51,6 +55,7 @@ data_filter <- function(id = NULL, ui_section = 1, column_data, column_name,
                  column_name = column_name, 
                  filter_ui = filter_ui,
                  updates = updates,
+                 all_choice = all_choice,
                  options = options)
 
 }
@@ -149,6 +154,7 @@ DataFilter <- R6Class(
     ui_section = NULL,
     column_name = NULL,
     updates = NULL,
+    all_choice = NULL,
     label = NULL,
     unique = NULL,
     range = NULL,
@@ -165,11 +171,13 @@ DataFilter <- R6Class(
                           filter_ui,
                           updates = NULL,
                           sort = TRUE,
+                          all_choice = NULL,
                           options = list()){
 
       self$id <- id
       self$ui_section <- ui_section
       self$column_name <- column_name
+      self$all_choice <- all_choice
       self$updates <- updates
       
       if(!("label" %in% names(options))){
@@ -223,7 +231,6 @@ DataFilter <- R6Class(
                                      numeric_range = update_range,
                                      switch = update_material
                                      )
-      
     },
     
     #----- Methods
@@ -282,7 +289,11 @@ DataFilter <- R6Class(
       }
       
       if(self$filter_ui %in% c("select","picker","checkboxes")){
-        data <- dplyr::filter(data, !!sym(column_name) %in% input$input_element)
+        
+        if(is.null(self$all_choice) || 
+           (!is.null(input$input_element) && input$input_element != self$all_choice)){
+          data <- dplyr::filter(data, !!sym(column_name) %in% input$input_element)
+        }
       }
       
       if(self$filter_ui == "numeric_min"){

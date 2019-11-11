@@ -16,7 +16,6 @@ update_select <- function(session, self, data, input){
   
   val <- unique(data)
   
-  # !! not a bug (?), but you have to set `selected` when updating the choices
   if(!is.null(self$ns_id)){
     oldval <- input[[self$ns_id]]
     if(!is.null(oldval)){
@@ -28,7 +27,14 @@ update_select <- function(session, self, data, input){
 
 update_checkboxes <- function(session, self, data, input){
   val <- unique(data)
-  shiny::updateCheckboxGroupInput(session, self$ns_id, choices = val, selected = input[[self$ns_id]])
+  
+  if(!is.null(self$ns_id)){
+    oldval <- input[[self$ns_id]]
+    if(!is.null(oldval)){
+      shiny::updateCheckboxGroupInput(session, self$ns_id, choices = val, selected = oldval)
+    }
+  }
+  
 }
 
 update_picker <- function(session, self, data, input){

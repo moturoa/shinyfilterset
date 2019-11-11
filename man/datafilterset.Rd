@@ -9,8 +9,8 @@ shinyfilterset(..., id = NULL)
 
 data_filter(id = NULL, ui_section = 1, column_data, column_name,
   filter_ui = c("picker", "select", "checkboxes", "numeric_min",
-  "slider", "numeric_max", "numeric_range", "switch"), sort = TRUE,
-  options = list())
+  "slider", "numeric_max", "numeric_range", "switch"), updates = FALSE,
+  sort = TRUE, options = list())
 }
 \arguments{
 \item{\dots}{The filters, or HTML elements. Define filters with \code{data_filter}, see Examples.}
@@ -18,4 +18,13 @@ data_filter(id = NULL, ui_section = 1, column_data, column_name,
 \description{
 An R6 class to define a 'filter set', a collection of ui elements (sliders, pickers, etc.) 
 to filter a dataset, for use in shiny applications.
+}
+\details{
+This function makes a shinyfilterset objects, which has a number of methods and properties. 
+id, elements, filters
+ui(), apply(), reactive(), update()
+The shinyfilterset is made up of \code{data_filter} objects, and optionally as many HTML tags as you 
+like, for layout purposes.  These have to be constructed with \code{shiny::tags} (see Examples).
+Each data filter has properties and methods of its own, most of which don't need to be called directly
+by the user.
 }

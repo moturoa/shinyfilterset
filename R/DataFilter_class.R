@@ -35,6 +35,7 @@ data_filter <- function(id = NULL, ui_section = 1, column_data, column_name,
                         filter_ui = c("picker","select","checkboxes",
                                       "numeric_min","slider",
                                       "numeric_max","numeric_range","switch"), 
+                        updates = FALSE,
                         sort = TRUE,
                         options = list()){
   
@@ -49,6 +50,7 @@ data_filter <- function(id = NULL, ui_section = 1, column_data, column_name,
                  column_data = column_data, 
                  column_name = column_name, 
                  filter_ui = filter_ui,
+                 updates = updates,
                  options = options)
 
 }
@@ -146,6 +148,7 @@ DataFilter <- R6Class(
     ns_id = NULL,
     ui_section = NULL,
     column_name = NULL,
+    updates = NULL,
     label = NULL,
     unique = NULL,
     range = NULL,
@@ -160,12 +163,14 @@ DataFilter <- R6Class(
                           column_data = NULL, 
                           column_name, 
                           filter_ui,
+                          updates = NULL,
                           sort = TRUE,
                           options = list()){
 
       self$id <- id
       self$ui_section <- ui_section
       self$column_name <- column_name
+      self$updates <- updates
       
       if(!("label" %in% names(options))){
         self$label <- self$column_name
@@ -223,13 +228,16 @@ DataFilter <- R6Class(
     
     #----- Methods
     update = function(session, data, input){
-
-      datavector <- data[[self$column_name]]
-      if(!is.null(datavector)){
-        do.call(self$update_function,
-                list(session = session, self = self, data = datavector, input = input)
-        )
+      
+      if(self$updates){
+        datavector <- data[[self$column_name]]
+        if(!is.null(datavector)){
+          do.call(self$update_function,
+                  list(session = session, self = self, data = datavector, input = input)
+          )
+        }
       }
+
     },
     
     apply = function(data){

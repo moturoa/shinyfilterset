@@ -23,6 +23,26 @@ shinyfilterset <- function(..., id = NULL){
   
 }
 
+#' @export
+filter_section <- function(section_nr = 1, ...){
+  
+  out <- lapply(list(...), function(x){
+    
+    # for html elements, store ui_section in attributes to avoid trouble
+    if(inherits(x, "shiny.tag")){
+      attributes(x)$ui_section <- section_nr
+    } else {
+      # for data filter objects, use R6 slot
+      x$ui_section <- section_nr
+    }
+    return(x)
+  })
+  
+  class(out) <- "filter_section"
+  
+return(out)
+}
+
 #' Make a data filter for use in shinyfilterset
 #' @param id
 #' @param ui_section
@@ -32,7 +52,6 @@ shinyfilterset <- function(..., id = NULL){
 #' @rdname datafilterset
 #' @export
 data_filter <- function(id = NULL, 
-                        ui_section = 1, 
                         column_data, 
                         column_name, 
                         filter_ui = c("picker","select","checkboxes",
@@ -42,7 +61,8 @@ data_filter <- function(id = NULL,
                         sort = TRUE,
                         all_choice = NULL,
                         search_method = c("equal","regex"),
-                        options = list()){
+                        options = list(),
+                        ui_section = 1){
   
   filter_ui <- match.arg(filter_ui)
   search_method <- match.arg(search_method)
@@ -52,14 +72,14 @@ data_filter <- function(id = NULL,
   }
   
   DataFilter$new(id = id,
-                 ui_section = ui_section,
                  column_data = column_data, 
                  column_name = column_name, 
                  filter_ui = filter_ui,
                  updates = updates,
                  all_choice = all_choice,
                  search_method = search_method,
-                 options = options)
+                 options = options,
+                 ui_section = ui_section)
 
 }
 
@@ -75,7 +95,11 @@ DataFilterSet <- R6::R6Class(
       
       self$id <- id
       
-      self$elements <- list(...)
+      args <- list(...)
+      if(inherits(args[[1]], "filter_section")){
+        args <- do.call(c, args)
+      }
+      self$elements <- args
       
       # Find elements that are filters.
       is_filter <- sapply(self$elements, is.R6)
@@ -84,16 +108,23 @@ DataFilterSet <- R6::R6Class(
       
       
     },
-    ui = function(ns, section = 1){
+    ui = function(ns, section = NULL){
       ns <- NS(self$id)
       
       tags$div(id = self$id,
         lapply(self$elements, function(x){
           
-          if(x$ui_section == section){
-            switch(class(x), 
-                   R6 = x$ui(ns),
-                   shiny.tag = x)
+          if(class(x) == "shiny.tag"){
+            
+            atr <- attributes(x)$ui_section
+            if(is.null(atr) || is.null(section) || atr == section){
+              return(x)
+            }
+            
+          }
+          if(class(x) == "R6" && 
+             (is.null(section) || x$ui_section == section)){
+            return(x$ui(ns))
           }
           
         })

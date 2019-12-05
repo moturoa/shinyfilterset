@@ -23,8 +23,11 @@ my_filters <- shinyfilterset(
               options = list(label = "Select cyl")),
   data_filter(column_name = "binary1", filter_ui = "switch", options = list(status = "primary")),
   tags$hr(),
-  data_filter(column_data = mtcars$binary2, column_name = "binary2", filter_ui = "checkboxes",
-              options = list(choices = c("Ja" = TRUE, "Nee" = FALSE), selected = TRUE, inline = TRUE))
+  data_filter(column_data = mtcars$binary2, 
+              column_name = "binary2", 
+              filter_ui = "checkboxes",
+              options = list(choices = c("Ja" = TRUE, "Nee" = FALSE), 
+                             selected = c(TRUE,FALSE), inline = TRUE))
   
 )
 

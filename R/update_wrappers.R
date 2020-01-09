@@ -1,20 +1,26 @@
-update_slider <- function(session, self, data, input){
+update_slider <- function(session, self, data = NULL, val = NULL, input){
   
-  val <- range(data, na.rm=TRUE)
+  if(is.null(val)){
+    val <- range(data, na.rm=TRUE)
+  }
   updateSliderInput(session, self$ns_id, value = val)
   
 }
 
-update_slider <- function(session, self, data, input){
+update_slider <- function(session, self, data = NULL, val = NULL, input){
   
-  val <- range(data, na.rm=TRUE)
+  if(is.null(val)){
+    val <- range(data, na.rm=TRUE)
+  }
   updateSliderInput(session, self$ns_id, value = val)
   
 }
 
-update_select <- function(session, self, data, input){
+update_select <- function(session, self, data = NULL, val = NULL, input){
   
-  val <- unique(data)
+  if(is.null(val)){
+    val <- unique(data)
+  }
   
   if(!is.null(self$ns_id)){
     oldval <- input[[self$ns_id]]
@@ -25,8 +31,11 @@ update_select <- function(session, self, data, input){
   
 }
 
-update_checkboxes <- function(session, self, data, input){
-  val <- unique(data)
+update_checkboxes <- function(session, self, data = NULL, val = NULL, input){
+  
+  if(is.null(val)){
+    val <- unique(data)
+  }
   
   if(!is.null(self$ns_id)){
     oldval <- input[[self$ns_id]]
@@ -37,39 +46,47 @@ update_checkboxes <- function(session, self, data, input){
   
 }
 
-update_picker <- function(session, self, data, input){
+update_picker <- function(session, self, data = NULL, val = NULL, input){
   
-  val <- unique(data)
+  if(is.null(val)){
+    val <- unique(data)
+  }
   shinyWidgets::updatePickerInput(session, self$ns_id, choices = val)
   
 }
 
-update_numeric_min <- function(session, self, data, input){
+update_numeric_min <- function(session, self, data = NULL, val = NULL, input){
   
-  val <- min(data, na.rm=TRUE)
+  if(is.null(val)){
+    val <- min(data, na.rm=TRUE)
+  }
   updateNumericInput(session, self$ns_id, value = val)
   
 }
 
 
-update_numeric_max <- function(session, self, data, input){
+update_numeric_max <- function(session, self, data = NULL, val = NULL, input){
   
-  val <- max(data, na.rm=TRUE)
+  if(is.null(val)){
+    val <- max(data, na.rm=TRUE)
+  }
   updateNumericInput(session, self$ns_id, value = val)
   
 }
 
 
-update_range <- function(session, self, data, input){
+update_range <- function(session, self, data = NULL, val = NULL, input){
   
-  val <- range(data, na.rm=TRUE)
+  if(is.null(val)){
+    val <- range(data, na.rm=TRUE)
+  }
   
   # !! apparently updateNumericRangeInput has a bug that we have to re-set the label.
   shinyWidgets::updateNumericRangeInput(session, self$ns_id, label = self$label, value = val)
   
 }
 
-update_material <- function(session, self, data, input){
+update_material <- function(session, self, data = NULL, val = NULL, input){
   
   # do nothing
   # different logic

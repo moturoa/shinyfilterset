@@ -50,13 +50,7 @@ my_filters <- shinyfilterset(
                              filter_ui = "checkboxes",
                              updates = FALSE,
                              options = list(choices = c("Ja" = TRUE, "Nee" = FALSE), 
-                                            selected = c(TRUE,FALSE), inline = TRUE)),
-                 data_filter(column_data = mtcars$gear, 
-                             column_name = "gear", 
-                             filter_ui = "select",
-                             updates = FALSE,
-                             all_choice = "All gears selected",
-                             options = list(label = "Select gear", multiple = TRUE))               
+                                            selected = c(TRUE,FALSE), inline = TRUE))             
                  
     )
   
@@ -79,7 +73,10 @@ ui <- fluidPage(
            actionButton("reset_filters", "Reset", 
                         icon = icon("refresh", lib = "glyphicon"), class = "btn btn-primary"),
            
-           actionButton("updateslider", "Update")
+           actionButton("updateslider", "Update"),
+           actionButton("browse","browser()"),
+           tags$h4("Used filters"),
+           textOutput("filterused")
     )
   ),
   
@@ -90,8 +87,21 @@ ui <- fluidPage(
 server <- function(input, output, session){ 
   
   rv <- reactiveValues(
-    data_filtered = NULL
+    data_filtered = NULL,
+    last_filter = NULL
   )
+
+  # Save last filter applied
+  lapply(my_filters$input_ids(),
+    function(x){
+
+      observe({
+        input[[x]]
+        rv$last_filter <- my_filters$name_from_id(x)
+      })
+
+  })
+  
   
   observe({
     input$reset_filters
@@ -104,8 +114,19 @@ server <- function(input, output, session){
     rv$data_filtered <- my_filters$apply(mtcars)
   })
   
-  observeEvent(input$updateslider, {
-    my_filters$update(session, rv$data_filtered, input)
+  # observe({
+  #   my_filters$update(session, rv$data_filtered, input, rv$last_filter)
+  # })
+  
+  observe({
+    isolate(my_filters$monitor(input))  
+  })
+  
+  output$filterused <- renderText({
+    
+    fils <- my_filters$used_filters(input)
+    paste(fils, collapse=", ")
+    
   })
   
   output$data_out <- renderUI({
@@ -120,6 +141,8 @@ server <- function(input, output, session){
   observeEvent(input$hide_filters, {
     shinyjs::toggle(my_filters$id, anim = TRUE)
   })
+  
+  observeEvent(input$browse, browser())
   
   
 }

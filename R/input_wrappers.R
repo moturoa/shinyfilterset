@@ -15,7 +15,8 @@ slider_input <- function(ns, self){
                options, 
                list(min = self$range[1], max = self$range[2]))
   
-  do.call(shiny::sliderInput, options)
+  list(ui = do.call(shiny::sliderInput, options),
+       value = options$value)
   
 }
 
@@ -33,7 +34,8 @@ numericrange_input <- function(ns, self){
   options <- c(list(inputId = ns("input_element")), 
                options)
   
-  do.call(shinyWidgets::numericRangeInput, options)
+  list(ui = do.call(shinyWidgets::numericRangeInput, options),
+       value = options$value)
 }
 
 
@@ -67,7 +69,8 @@ select_input <- function(ns, self, type = c("select","picker")){
   options <- c(list(inputId = ns("input_element")), 
                options)
   
-  do.call(input_field, options)
+  list(ui = do.call(input_field, options),
+       value = options$selected)
   
 }
 
@@ -88,7 +91,8 @@ checkboxes_input <- function(ns, self){
   options <- c(list(inputId = ns("input_element")), 
                options)
   
-  do.call(shiny::checkboxGroupInput, options)
+  list(ui = do.call(shiny::checkboxGroupInput, options),
+       value = options$selected)
   
 }
 
@@ -112,7 +116,8 @@ numeric_input <- function(ns, self, type = c("min", "max")){
                options, 
                list(min = self$range[1], max = self$range[2]))
   
-  do.call(shiny::numericInput, options)
+  list(ui = do.call(shiny::numericInput, options),
+       value = options$value)
 }
 
 
@@ -129,7 +134,9 @@ binary_input <- function(ns, self, type = "switch"){
   
   options <- c(list(inputId = ns("input_element")), 
                options)
-  do.call(shinyWidgets::materialSwitch, options)
+  
+  list(ui = do.call(shinyWidgets::materialSwitch, options),
+       value = options$value)
 
 }
 

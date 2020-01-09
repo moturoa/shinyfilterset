@@ -91,6 +91,7 @@ DataFilterSet <- R6::R6Class(
     id = NULL,
     elements = NULL,
     filters = NULL,
+    history = c(),
     initialize = function(..., id){
       
       self$id <- id
@@ -102,7 +103,7 @@ DataFilterSet <- R6::R6Class(
       self$elements <- args
       
       # Find elements that are filters.
-      is_filter <- sapply(self$elements, is.R6)
+      is_filter <- sapply(self$elements, is.DataFilter)
       self$filters <- self$elements[is_filter]
       names(self$filters) <- sapply(self$filters, "[[", "column_name")
       
@@ -114,16 +115,16 @@ DataFilterSet <- R6::R6Class(
       tags$div(id = self$id,
         lapply(self$elements, function(x){
           
-          if(class(x) == "shiny.tag"){
+          if(is.Tag(x)){
             
             atr <- attributes(x)$ui_section
-            if(is.null(atr) || is.null(section) || atr == section){
+            if(is.null(atr) || is.null(section) || atr %in% section){
               return(x)
             }
             
           }
-          if(class(x) == "R6" && 
-             (is.null(section) || x$ui_section == section)){
+          if(is.DataFilter(x) && 
+             (is.null(section) || x$ui_section %in% section)){
             return(x$ui(ns))
           }
           
@@ -133,36 +134,83 @@ DataFilterSet <- R6::R6Class(
     },
     
     apply = function(data){
-        callModule(private$module_server, self$id,
+        callModule(private$module_server, 
+                   self$id,
                    data = data,
                    filters = self$filters)
     },
     
-    update = function(session, data, input){
+    update = function(session, data, input, last_filter = NULL){
       
-      lapply(self$filters, function(x)x$update(session, data, input))
-      
+      lapply(self$filters, function(x)x$update(session, data, input, last_filter))
+    
     },
     
     reactive = function(input){
       lapply(self$filters, function(x)input[[x$id]])
     },
     
+    monitor = function(input){
+      lapply(self$filters, function(x){
+
+        observeEvent(input[[x$ns_id]], {
+          
+          self$history <- c(self$history, x$column_name)
+          
+        })
+
+      })
+    },
+    
+    used_filters = function(input){
+      
+      chk <- sapply(names(self$filters), function(x){
+        !isTRUE(all.equal(as.character(self$get_value(input, x)), 
+                          as.character(self$filters[[x]]$value_initial)))
+      })
+      
+      names(self$filters)[chk]
+      
+    },
+    
+    
+    
     get_value = function(input, name){
       
-      ns <- NS(self$id)
       id <- private$get_filter_id(name)
       input[[id]]
       
+    },
+    
+    set_value = function(session, input, name, val){
+      
+      self$filters[[name]]$set(session, val, input)
+      
+    },
+    
+    input_ids = function(){
+      ns <- NS(self$id)
+      bare_ids <- sapply(self$filters, "[[", "id")
+      nms <- names(self$filters)
+      ids <- paste0(ns(bare_ids), "-input_element")
+      names(ids) <- nms
+    ids
+    },
+    
+    name_from_id = function(id){
+      ids <- self$input_ids()
+      names(self$filters)[ids == id]
     }
     
   ),
   
   private = list(
+    
     get_filter_id = function(name){
       ns <- NS(self$id)
       paste0(ns(self$filters[[name]]$id), "-input_element")
     },
+    
     module_server = function(input, output, session, data, filters){
       
       out <- filters[[1]]$apply(data)
@@ -181,6 +229,7 @@ DataFilterSet <- R6::R6Class(
 # Class definition: a single filter.
 # Not used by user!
 DataFilter <- R6Class(
+  "DataFilter",
   public = list(
     
     id = NULL,
@@ -197,6 +246,7 @@ DataFilter <- R6Class(
     options = NULL,
     input_function = NULL,
     update_function = NULL,
+    value_initial = NULL,
     
     # DataFilter$new()
     initialize = function(id, 
@@ -271,9 +321,9 @@ DataFilter <- R6Class(
     },
     
     #----- Methods
-    update = function(session, data, input){
-      
-      if(self$updates){
+    update = function(session, data, input, last_filter = ""){
+
+      if(self$updates && !last_filter == self$column_name){
         datavector <- data[[self$column_name]]
         if(!is.null(datavector)){
           do.call(self$update_function,
@@ -282,6 +332,14 @@ DataFilter <- R6Class(
         }
       }
 
+    },
+    
+    set = function(session, val, input){
+      
+      do.call(self$update_function,
+              list(session = session, self = self, val = val, input = input)
+      )
+      
     },
     
     apply = function(data){
@@ -296,7 +354,7 @@ DataFilter <- R6Class(
       ns <- NS(ns(self$id))
       self$ns_id <- ns("input_element")
       
-      switch(self$filter_ui, 
+      out <- switch(self$filter_ui, 
              
              slider = slider_input(ns, self),
              select = select_input(ns, self),
@@ -309,6 +367,9 @@ DataFilter <- R6Class(
              
       )
       
+      self$value_initial <- out$value
+      
+    return(out$ui)
     }
   ),
   private = list(
@@ -327,11 +388,15 @@ DataFilter <- R6Class(
       
       if(self$filter_ui %in% c("select","picker","checkboxes")){
         
+        # 'all_choice' = single choice that acts as all selector (e.g. "All options")
         if(is.null(self$all_choice) || 
            (!is.null(input$input_element) && input$input_element != self$all_choice)){
           
+          # Filter with equality
           if(self$search_method == "equal"){
             data <- dplyr::filter(data, !!sym(column_name) %in% input$input_element)  
+          
+          # Filter with regular expression
           } else if(self$search_method == "regex"){
             regex <- paste(input$input_element, collapse = "|")
             data <- dplyr::filter(data, grepl(regex, !!sym(column_name)))

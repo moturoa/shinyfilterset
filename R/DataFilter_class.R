@@ -145,10 +145,7 @@ DataFilterSet <- R6::R6Class(
       lapply(self$filters, function(x)x$update(session, data, input, last_filter))
     
     },
-    
-    reactive = function(input){
-      lapply(self$filters, function(x)input[[x$id]])
-    },
+
     
     monitor = function(input){
       lapply(self$filters, function(x){
@@ -169,10 +166,12 @@ DataFilterSet <- R6::R6Class(
                           as.character(self$filters[[x]]$value_initial)))
       })
       
-      names(self$filters)[chk]
+      fils <- names(self$filters)[chk]
+      vals <- lapply(fils, function(x)self$get_value(input, x))
+      names(vals) <- fils
       
+    return(vals)
     },
-    
     
     
     get_value = function(input, name){
@@ -185,6 +184,15 @@ DataFilterSet <- R6::R6Class(
     set_value = function(session, input, name, val){
       
       self$filters[[name]]$set(session, val, input)
+      
+    },
+    
+    # resets values (selections etc.), not choices, min-max, labels.
+    reset = function(session, input){
+      
+      lapply(self$filters, function(x){
+        x$reset(session = session, input = input)
+      })
       
     },
     
@@ -246,6 +254,7 @@ DataFilter <- R6Class(
     options = NULL,
     input_function = NULL,
     update_function = NULL,
+    set_function = NULL,
     value_initial = NULL,
     
     # DataFilter$new()
@@ -307,7 +316,8 @@ DataFilter <- R6Class(
                                     switch = "shinyWidgets::materialSwitch"
                                     )
       
-      # register the function that can be used to update the input field
+      # register the function that can be used to update the input field,
+      # choices, min/max, etc.
       self$update_function <- switch(self$filter_ui,
                                      slider = update_slider,
                                      select = update_select,
@@ -318,6 +328,20 @@ DataFilter <- R6Class(
                                      numeric_range = update_range,
                                      switch = update_material
                                      )
+      
+      # The function to set the value of the filter.
+      self$set_function <- switch(self$filter_ui,
+                                     slider = set_slider,
+                                     select = set_select,
+                                     checkboxes = set_checkboxes,
+                                     picker = set_picker,
+                                     numeric_min = set_numeric_min,
+                                     numeric_max = set_numeric_max,
+                                     numeric_range = set_range,
+                                     switch = set_material
+      )
+      
+      
     },
     
     #----- Methods
@@ -336,11 +360,20 @@ DataFilter <- R6Class(
     
     set = function(session, val, input){
       
-      do.call(self$update_function,
-              list(session = session, self = self, val = val, input = input)
+      do.call(self$set_function,
+              list(session = session, self = self, value = val)
       )
       
     },
+    
+    reset = function(session, input){
+    
+      do.call(self$set_function,
+              list(session = session, self = self, value = self$value_initial)
+      )
+      
+    },
+    
     
     apply = function(data){
       callModule(private$module_server, self$id,

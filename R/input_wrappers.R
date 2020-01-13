@@ -1,7 +1,7 @@
 
 
 
-slider_input <- function(ns, self){
+slider_input <- function(id, self){
   
   options <- self$options
   
@@ -11,7 +11,7 @@ slider_input <- function(ns, self){
   
   options$label <- self$label
   
-  options <- c(list(inputId = ns("input_element")), 
+  options <- c(list(inputId = id), 
                options, 
                list(min = self$range[1], max = self$range[2]))
   
@@ -21,7 +21,7 @@ slider_input <- function(ns, self){
 }
 
 
-numericrange_input <- function(ns, self){
+numericrange_input <- function(id, self){
   
   options <- self$options
   
@@ -31,7 +31,7 @@ numericrange_input <- function(ns, self){
   
   options$label <- self$label
   
-  options <- c(list(inputId = ns("input_element")), 
+  options <- c(list(inputId = id), 
                options)
   
   list(ui = do.call(shinyWidgets::numericRangeInput, options),
@@ -39,7 +39,7 @@ numericrange_input <- function(ns, self){
 }
 
 
-select_input <- function(ns, self, type = c("select","picker")){
+select_input <- function(id, self, type = c("select","picker")){
   
   type <- match.arg(type)
   input_field <- switch(type,
@@ -66,7 +66,7 @@ select_input <- function(ns, self, type = c("select","picker")){
   
   options$label <- self$label
   
-  options <- c(list(inputId = ns("input_element")), 
+  options <- c(list(inputId = id), 
                options)
   
   list(ui = do.call(input_field, options),
@@ -75,7 +75,7 @@ select_input <- function(ns, self, type = c("select","picker")){
 }
 
 
-checkboxes_input <- function(ns, self){
+checkboxes_input <- function(id, self){
   
   options <- self$options
   
@@ -88,7 +88,7 @@ checkboxes_input <- function(ns, self){
   
   options$label <- self$label
   
-  options <- c(list(inputId = ns("input_element")), 
+  options <- c(list(inputId = id), 
                options)
   
   list(ui = do.call(shiny::checkboxGroupInput, options),
@@ -98,7 +98,7 @@ checkboxes_input <- function(ns, self){
 
 
 
-numeric_input <- function(ns, self, type = c("min", "max")){
+numeric_input <- function(id, self, type = c("min", "max")){
   
   type <- match.arg(type)
   type_index <- switch(type,
@@ -112,7 +112,7 @@ numeric_input <- function(ns, self, type = c("min", "max")){
   
   options$label <- self$label
   
-  options <- c(list(inputId = ns("input_element")), 
+  options <- c(list(inputId = id), 
                options, 
                list(min = self$range[1], max = self$range[2]))
   
@@ -121,7 +121,7 @@ numeric_input <- function(ns, self, type = c("min", "max")){
 }
 
 
-binary_input <- function(ns, self, type = "switch"){
+binary_input <- function(id, self, type = "switch"){
 
   options <- self$options
   type <- match.arg(type)
@@ -132,7 +132,7 @@ binary_input <- function(ns, self, type = "switch"){
   
   options$label <- self$label
   
-  options <- c(list(inputId = ns("input_element")), 
+  options <- c(list(inputId = id), 
                options)
   
   list(ui = do.call(shinyWidgets::materialSwitch, options),

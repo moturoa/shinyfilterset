@@ -40,7 +40,7 @@ filter_section <- function(section_nr = 1, ...){
   
   class(out) <- "filter_section"
   
-return(out)
+  return(out)
 }
 
 #' Make a data filter for use in shinyfilterset
@@ -68,7 +68,7 @@ data_filter <- function(id = NULL,
   search_method <- match.arg(search_method)
   
   if(is.null(id)){
-    id <- UUIDgenerate()
+    id <- uuid::UUIDgenerate()
   }
   
   DataFilter$new(id = id,
@@ -80,7 +80,7 @@ data_filter <- function(id = NULL,
                  search_method = search_method,
                  options = options,
                  ui_section = ui_section)
-
+  
 }
 
 
@@ -92,7 +92,7 @@ DataFilterSet <- R6::R6Class(
     elements = NULL,
     filters = NULL,
     history = c(),
-    ns = function(x){x},
+    ns = NS(NULL),
     initialize = function(..., id){
       
       self$id <- id
@@ -110,65 +110,42 @@ DataFilterSet <- R6::R6Class(
       
       
     },
-    ui = function(ns, section = NULL){
+    ui = function(ns = NS(NULL), section = NULL){
       
-      if(missing(ns)){
-        ns <- NS(self$id)  
-        self$ns <- ns
-      }
+      ns <- NS(ns(self$id))
       
-      tags$div(id = self$id,
-        lapply(self$elements, function(x){
-          
-          if(is.Tag(x)){
-            
-            atr <- attributes(x)$ui_section
-            if(is.null(atr) || is.null(section) || atr %in% section){
-              return(x)
-            }
-            
-          }
-          if(is.DataFilter(x) && 
-             (is.null(section) || x$ui_section %in% section)){
-            return(x$ui(ns))
-          }
-          
-        })
+      tags$div(id = ns(self$id),
+               lapply(self$elements, function(x){
+                 
+                 if(is.Tag(x)){
+                   
+                   atr <- attributes(x)$ui_section
+                   if(is.null(atr) || is.null(section) || atr %in% section){
+                     return(x)
+                   }
+                   
+                 }
+                 if(is.DataFilter(x) && 
+                    (is.null(section) || x$ui_section %in% section)){
+                   return(x$ui(ns))
+                 }
+                 
+               })
       )
       
     },
     
     apply = function(data){
-        callModule(private$module_server, 
-                   self$id,
-                   data = data,
-                   filters = self$filters)
+      callModule(private$module_server, 
+                 id = self$id,
+                 data = data,
+                 filters = self$filters)
     },
     
     update = function(session, data, input, last_filter = NULL){
       
       lapply(self$filters, function(x)x$update(session, data, input, last_filter))
-    
-    },
-
-    reactive = function(input){
-
-      lapply(names(self$filters),
-             function(x)self$get_value(input, x))
       
-    },
-    
-    
-    monitor = function(input){
-      lapply(self$filters, function(x){
-
-        observeEvent(input[[x$ns_id]], {
-          
-          self$history <- c(self$history, x$column_name)
-          
-        })
-
-      })
     },
     
     used_filters = function(input){
@@ -182,20 +159,25 @@ DataFilterSet <- R6::R6Class(
       vals <- lapply(fils, function(x)self$get_value(input, x))
       names(vals) <- fils
       
-    return(vals)
+      return(vals)
     },
     
+
+    get_id = function(name){
+      
+      NS(self$id)(self$filters[[name]]$id)
+      
+    },
     
     get_value = function(input, name){
       
-      id <- self$get_filter_id(name)
-      input[[id]]
+      input[[self$get_id(name)]]
       
     },
     
     set_value = function(session, input, name, val){
       
-      self$filters[[name]]$set(session, val, input)
+      self$filters[[name]]$set(session, id = self$get_id(name), val, input)
       
     },
     
@@ -203,57 +185,40 @@ DataFilterSet <- R6::R6Class(
     reset = function(session, input){
       
       lapply(self$filters, function(x){
-        x$reset(session = session, input = input)
+        x$reset(session = session, input = input, id = self$get_id(x$column_name))
       })
       
-    },
-    
-    input_ids = function(){
-      ns <- NS(self$id)
-      bare_ids <- sapply(self$filters, "[[", "id")
-      nms <- names(self$filters)
-      ids <- paste0(ns(bare_ids), "-input_element")
-      names(ids) <- nms
-    ids
-    },
-    
-    name_from_id = function(id){
-      ids <- self$input_ids()
-      names(self$filters)[ids == id]
-    },
-    
-    get_filter_id = function(name){
-      
-      paste0(self$ns(self$filters[[name]]$id), "-input_element")
     }
     
   ),
   
   private = list(
-
+    
     module_server = function(input, output, session, data, filters){
       
-      out <- filters[[1]]$apply(data)
-      if(length(filters) > 1){
-        for(i in 2:length(filters)){
-          out <- filters[[i]]$apply(out)
-        }
+      nms <- names(self$filters)
+      
+      for(i in seq_along(nms)){
+        
+        filt <- self$filters[[nms[i]]]
+        data <- apply_filter(data, 
+                             value = input[[filt$id]],
+                             object = filt)
+        
       }
-      return(out)
-    
+      
+    return(data)
     }
   )
 )
 
 
 # Class definition: a single filter.
-# Not used by user!
 DataFilter <- R6Class(
   "DataFilter",
   public = list(
     
     id = NULL,
-    ns_id = NULL,
     ui_section = NULL,
     column_name = NULL,
     updates = NULL,
@@ -280,7 +245,7 @@ DataFilter <- R6Class(
                           all_choice = NULL,
                           search_method = NULL,
                           options = list()){
-
+      
       self$id <- id
       self$ui_section <- ui_section
       self$column_name <- column_name
@@ -326,7 +291,7 @@ DataFilter <- R6Class(
                                     numeric_max = "shiny::numericInput",
                                     numeric_range = "shinyWidgets::numericRangeInput",
                                     switch = "shinyWidgets::materialSwitch"
-                                    )
+      )
       
       # register the function that can be used to update the input field,
       # choices, min/max, etc.
@@ -339,18 +304,18 @@ DataFilter <- R6Class(
                                      numeric_max = update_numeric_max,
                                      numeric_range = update_range,
                                      switch = update_material
-                                     )
+      )
       
       # The function to set the value of the filter.
       self$set_function <- switch(self$filter_ui,
-                                     slider = set_slider,
-                                     select = set_select,
-                                     checkboxes = set_checkboxes,
-                                     picker = set_picker,
-                                     numeric_min = set_numeric_min,
-                                     numeric_max = set_numeric_max,
-                                     numeric_range = set_range,
-                                     switch = set_material
+                                  slider = set_slider,
+                                  select = set_select,
+                                  checkboxes = set_checkboxes,
+                                  picker = set_picker,
+                                  numeric_min = set_numeric_min,
+                                  numeric_max = set_numeric_max,
+                                  numeric_range = set_range,
+                                  switch = set_material
       )
       
       
@@ -358,7 +323,7 @@ DataFilter <- R6Class(
     
     #----- Methods
     update = function(session, data, input, last_filter = ""){
-
+      
       if(self$updates && !last_filter == self$column_name){
         datavector <- data[[self$column_name]]
         if(!is.null(datavector)){
@@ -367,110 +332,43 @@ DataFilter <- R6Class(
           )
         }
       }
-
+      
     },
     
-    set = function(session, val, input){
+    set = function(session, id, val, input){
       
       do.call(self$set_function,
-              list(session = session, self = self, value = val)
+              list(session = session, id = id, self = self, value = val)
       )
       
     },
     
-    reset = function(session, input){
-    
+    reset = function(session, input, id){
+      
       do.call(self$set_function,
-              list(session = session, self = self, value = self$value_initial)
+              list(session = session, id = id, self = self, value = self$value_initial)
       )
       
-    },
-    
-    
-    apply = function(data){
-      callModule(private$module_server, self$id,
-                 data = data,
-                 column_name = self$column_name)
     },
     
     ui = function(ns = NS(NULL)){
       
-      # https://stackoverflow.com/questions/46693161/wrapping-shiny-modules-in-r6-classes
-      ns <- NS(ns(self$id))  
-      
-      self$ns_id <- ns("input_element")
-      
+      id <- ns(self$id)
       out <- switch(self$filter_ui, 
-             
-             slider = slider_input(ns, self),
-             select = select_input(ns, self),
-             checkboxes = checkboxes_input(ns, self),
-             picker = select_input(ns, self, type = "picker"),
-             numeric_min = numeric_input(ns, self, "min"),
-             numeric_max = numeric_input(ns, self, "max"),
-             numeric_range = numericrange_input(ns, self),
-             switch = binary_input(ns, self, type = "switch")
-             
+                    
+                    slider = slider_input(id, self),
+                    select = select_input(id, self),
+                    checkboxes = checkboxes_input(id, self),
+                    picker = select_input(id, self, type = "picker"),
+                    numeric_min = numeric_input(id, self, "min"),
+                    numeric_max = numeric_input(id, self, "max"),
+                    numeric_range = numericrange_input(id, self),
+                    switch = binary_input(id, self, type = "switch")
       )
       
       self$value_initial <- out$value
       
-    return(out$ui)
-    }
-  ),
-  private = list(
-    module_server = function(input, output, session, data, column_name){
-      
-      
-      # If the filter UI has not been generated yet
-      if(is.null(input$input_element)){
-        print(names(reactiveValuesToList(input)))
-        return(data)
-      }
-      
-      if(self$filter_ui %in% c("slider","numeric_range")){
-        data <- dplyr::filter(data, 
-                              !!sym(column_name) >= input$input_element[1],
-                              !!sym(column_name) <= input$input_element[2])
-      }
-      
-      if(self$filter_ui %in% c("select","picker","checkboxes")){
-        
-        # 'all_choice' = single choice that acts as all selector (e.g. "All options")
-        if(is.null(self$all_choice) || 
-           (!is.null(input$input_element) && input$input_element != self$all_choice)){
-          
-          # Filter with equality
-          if(self$search_method == "equal"){
-            data <- dplyr::filter(data, !!sym(column_name) %in% input$input_element)  
-          
-          # Filter with regular expression
-          } else if(self$search_method == "regex"){
-            regex <- paste(input$input_element, collapse = "|")
-            data <- dplyr::filter(data, grepl(regex, !!sym(column_name)))
-          }
-          
-        }
-      }
-      
-      if(self$filter_ui == "numeric_min"){
-        data <- dplyr::filter(data, !!sym(column_name) >= input$input_element)
-      }
-      
-      if(self$filter_ui == "numeric_max"){
-        data <- dplyr::filter(data, !!sym(column_name) <= input$input_element)
-      }
-      
-      if(self$filter_ui == "switch"){
-        
-        # If the switch is OFF (FALSE), don't filter. Only filter the TRUE values if the switch is ON.
-        if(input$input_element){
-          data <- dplyr::filter(data, !!sym(column_name) == input$input_element)  
-        }
-        
-      }
-      
-      return(data)  
+      return(out$ui)
     }
   )
 )

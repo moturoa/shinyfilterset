@@ -1,51 +1,51 @@
-set_slider <- function(session, self, value){
+set_slider <- function(session, id, self, value){
   
-  updateSliderInput(session, self$ns_id, value = value)
-  
-}
-
-set_select <- function(session, self, value){
-  
-  updateSelectInput(session, self$ns_id, selected = value)
+  updateSliderInput(session, id, value = value)
   
 }
 
-set_checkboxes <- function(session, self, value){
+set_select <- function(session, id, self, value){
   
-  shiny::updateCheckboxGroupInput(session, self$ns_id, selected = value)
-  
-}
-
-set_picker <- function(session, self, value){
-  
-  shinyWidgets::updatePickerInput(session, self$ns_id, choices = value)
+  updateSelectInput(session, id, selected = value)
   
 }
 
-set_numeric_min <- function(session, self, value){
+set_checkboxes <- function(session, id, self, value){
   
-  updateNumericInput(session, self$ns_id, value = value)
+  shiny::updateCheckboxGroupInput(session, id, selected = value)
   
 }
 
-
-set_numeric_max <- function(session, self, value){
+set_picker <- function(session, id, self, value){
   
-  updateNumericInput(session, self$ns_id, value = value)
+  shinyWidgets::updatePickerInput(session, id, choices = value)
+  
+}
+
+set_numeric_min <- function(session, id, self, value){
+  
+  updateNumericInput(session, id, value = value)
   
 }
 
 
-set_range <- function(session, self, value){
+set_numeric_max <- function(session, id, self, value){
+  
+  updateNumericInput(session, id, value = value)
+  
+}
+
+
+set_range <- function(session, id, self, value){
   
   # !! apparently updateNumericRangeInput has a bug that we have to re-set the label.
-  shinyWidgets::updateNumericRangeInput(session, self$ns_id, label = self$label, value = value)
+  shinyWidgets::updateNumericRangeInput(session, id, label = self$label, value = value)
   
 }
 
-set_material <- function(session, self, value){
+set_material <- function(session, id, self, value){
 
-  shinyWidgets::updateMaterialSwitch(session, self$ns_id, value = value)
+  shinyWidgets::updateMaterialSwitch(session, id, value = value)
   
 }
 

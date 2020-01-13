@@ -132,11 +132,9 @@ testmodule <- function(input, output, session){
   
   observe({
     
-    my_filters$reactive(input)
     rv$data_filtered <- my_filters$apply(mtcars)
-    print(nrow(rv$data_filtered))
+    
   })
-  
   
   
   output$filterused <- renderText({

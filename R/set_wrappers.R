@@ -1,12 +1,12 @@
 set_slider <- function(session, id, self, value){
   
-  updateSliderInput(session, id, value = value)
+  shiny::updateSliderInput(session, id, value = value)
   
 }
 
 set_select <- function(session, id, self, value){
   
-  updateSelectInput(session, id, selected = value)
+  shiny::updateSelectInput(session, id, selected = value)
   
 }
 
@@ -24,14 +24,14 @@ set_picker <- function(session, id, self, value){
 
 set_numeric_min <- function(session, id, self, value){
   
-  updateNumericInput(session, id, value = value)
+  shiny::updateNumericInput(session, id, value = value)
   
 }
 
 
 set_numeric_max <- function(session, id, self, value){
   
-  updateNumericInput(session, id, value = value)
+  shiny::updateNumericInput(session, id, value = value)
   
 }
 

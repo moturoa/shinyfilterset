@@ -115,6 +115,13 @@ testmodule <- function(input, output, session){
     output$div_my_filters_2 <- renderUI(my_filters$ui(ns = session$ns, section = 2))
   })
   
+  # observe({
+  #   
+  #   my_filters$reactive(input)
+  #   #my_filters$update(session, isolate(rv$data_filtered), input)
+  #   print("reacted")
+  # })
+  
   observeEvent(input$btn_load, {
     
     fils <- readRDS(input$sel_load)
@@ -134,6 +141,8 @@ testmodule <- function(input, output, session){
     
     rv$data_filtered <- my_filters$apply(mtcars)
     
+    my_filters$update(session, rv$data_filtered, input)
+    print("filtered")
   })
   
   
@@ -153,9 +162,7 @@ testmodule <- function(input, output, session){
     
   })
   
-  
   observeEvent(input$browse, browser())
-  
   
   observe({
     toggleState("btn_save", input$txt_save != "")

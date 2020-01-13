@@ -142,9 +142,15 @@ DataFilterSet <- R6::R6Class(
                  filters = self$filters)
     },
     
-    update = function(session, data, input, last_filter = NULL){
+    update = function(session, data, input, last_filter = ""){
       
-      lapply(self$filters, function(x)x$update(session, data, input, last_filter))
+      lapply(self$filters, function(x){
+        x$update(session, 
+                 id = self$get_id(x$column_name), 
+                 data = data, 
+                 input = input, 
+                 last_filter = last_filter)
+      })
       
     },
     
@@ -162,7 +168,15 @@ DataFilterSet <- R6::R6Class(
       return(vals)
     },
     
-
+    reactive = function(input){
+      
+      lapply(names(self$filters), function(x){
+        self$get_value(input, x)
+      })
+      
+    },
+    
+    
     get_id = function(name){
       
       NS(self$id)(self$filters[[name]]$id)
@@ -322,13 +336,13 @@ DataFilter <- R6Class(
     },
     
     #----- Methods
-    update = function(session, data, input, last_filter = ""){
+    update = function(session, id, data, input, last_filter = ""){
       
       if(self$updates && !last_filter == self$column_name){
         datavector <- data[[self$column_name]]
         if(!is.null(datavector)){
           do.call(self$update_function,
-                  list(session = session, self = self, data = datavector, input = input)
+                  list(session = session, id = id, self = self, data = datavector, input = input)
           )
         }
       }

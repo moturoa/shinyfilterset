@@ -92,6 +92,7 @@ DataFilterSet <- R6::R6Class(
     elements = NULL,
     filters = NULL,
     history = c(),
+    ns = function(x){x},
     initialize = function(..., id){
       
       self$id <- id
@@ -110,7 +111,11 @@ DataFilterSet <- R6::R6Class(
       
     },
     ui = function(ns, section = NULL){
-      ns <- NS(self$id)
+      
+      if(missing(ns)){
+        ns <- NS(self$id)  
+        self$ns <- ns
+      }
       
       tags$div(id = self$id,
         lapply(self$elements, function(x){
@@ -146,6 +151,13 @@ DataFilterSet <- R6::R6Class(
     
     },
 
+    reactive = function(input){
+
+      lapply(names(self$filters),
+             function(x)self$get_value(input, x))
+      
+    },
+    
     
     monitor = function(input){
       lapply(self$filters, function(x){
@@ -176,7 +188,7 @@ DataFilterSet <- R6::R6Class(
     
     get_value = function(input, name){
       
-      id <- private$get_filter_id(name)
+      id <- self$get_filter_id(name)
       input[[id]]
       
     },
@@ -208,17 +220,17 @@ DataFilterSet <- R6::R6Class(
     name_from_id = function(id){
       ids <- self$input_ids()
       names(self$filters)[ids == id]
+    },
+    
+    get_filter_id = function(name){
+      
+      paste0(self$ns(self$filters[[name]]$id), "-input_element")
     }
     
   ),
   
   private = list(
-    
-    get_filter_id = function(name){
-      ns <- NS(self$id)
-      paste0(ns(self$filters[[name]]$id), "-input_element")
-    },
-    
+
     module_server = function(input, output, session, data, filters){
       
       out <- filters[[1]]$apply(data)
@@ -384,7 +396,8 @@ DataFilter <- R6Class(
     ui = function(ns = NS(NULL)){
       
       # https://stackoverflow.com/questions/46693161/wrapping-shiny-modules-in-r6-classes
-      ns <- NS(ns(self$id))
+      ns <- NS(ns(self$id))  
+      
       self$ns_id <- ns("input_element")
       
       out <- switch(self$filter_ui, 
@@ -408,8 +421,10 @@ DataFilter <- R6Class(
   private = list(
     module_server = function(input, output, session, data, column_name){
       
+      
       # If the filter UI has not been generated yet
       if(is.null(input$input_element)){
+        print(names(reactiveValuesToList(input)))
         return(data)
       }
       

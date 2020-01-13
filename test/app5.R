@@ -7,8 +7,8 @@ library(dplyr)
 library(shinyfilterset)
 
 set.seed(1)
-mtcars$binary1 <- sample(c(TRUE,FALSE),nrow(mtcars), replace=TRUE)
-mtcars$binary2 <- sample(c(TRUE,FALSE),nrow(mtcars), replace=TRUE)
+mtcars$binary1 <- sample(c(TRUE,FALSE),nrow(mtcars),replace=TRUE)
+mtcars$binary2 <- sample(c(TRUE,FALSE),nrow(mtcars),replace=TRUE)
 
 
 my_filters <- shinyfilterset(
@@ -60,41 +60,48 @@ my_filters <- shinyfilterset(
 
 
 
-ui <- fluidPage(
-  useShinyjs(),
+testmoduleUI <- function(id){
   
-  fluidRow(
-    column(4, uiOutput("div_my_filters_1")),
-    column(4, uiOutput("div_my_filters_2")),
-    column(4, 
-           tags$br(),
-           tags$br(),
-           actionButton("btn_reset_filters", "Reset", 
-                        icon = icon("refresh", lib = "glyphicon"), class = "btn btn-primary"),
-           
-           actionButton("updateslider", "Update"),
-           actionButton("browse","browser()"),
-           actionButton("btn_reset_filters2", "Reset (2)", 
-                        icon = icon("refresh", lib = "glyphicon")),
-           tags$h4("Used filters"),
-           textOutput("filterused"),
-           tags$h4("Save"),
-           textInput("txt_save", "Name filter"),
-           shinyjs::disabled(
-             actionButton("btn_save", "Save")
-           ),
-           tags$h4("Load"),
-           selectInput("sel_load", "Select filter", choices = dir("data", full.names=TRUE)),
-           actionButton("btn_load", "Load")
-           
+  ns <- NS(id)
+  
+  tagList(
+      fluidRow(
+        column(4, uiOutput(ns("div_my_filters_1"))),
+        column(4, uiOutput(ns("div_my_filters_2"))),
+        column(4, 
+               tags$br(),
+               tags$br(),
+               actionButton(ns("btn_reset_filters"), "Reset", 
+                            icon = icon("refresh", lib = "glyphicon"), class = "btn btn-primary"),
+               
+               actionButton(ns("updateslider"), "Update"),
+               actionButton(ns("browse"),"browser()"),
+               actionButton(ns("btn_reset_filters2"), "Reset (2)", 
+                            icon = icon("refresh", lib = "glyphicon")),
+               tags$h4("Used filters"),
+               textOutput(ns("filterused")),
+               tags$h4("Save"),
+               textInput(ns("txt_save"), "Name filter"),
+               shinyjs::disabled(
+                 actionButton(ns("btn_save"), "Save")
+               ),
+               tags$h4("Load"),
+               selectInput(ns("sel_load"), "Select filter", choices = dir("data", full.names=TRUE)),
+               actionButton(ns("btn_load"), "Load")
+               
+        )
+        
+      ),
+      fluidRow(
+        tags$hr(),
+        uiOutput(ns("data_out"))
+      )
     )
-  ),
-  
-  tags$hr(),
-  uiOutput("data_out")
-)
 
-server <- function(input, output, session){ 
+  
+}
+
+testmodule <- function(input, output, session){ 
   
   rv <- reactiveValues(
     data_filtered = NULL,
@@ -104,8 +111,8 @@ server <- function(input, output, session){
   observe({
     input$btn_reset_filters
     
-    output$div_my_filters_1 <- renderUI(my_filters$ui(section = 1))
-    output$div_my_filters_2 <- renderUI(my_filters$ui(section = 2))
+    output$div_my_filters_1 <- renderUI(my_filters$ui(ns = session$ns, section = 1))
+    output$div_my_filters_2 <- renderUI(my_filters$ui(ns = session$ns, section = 2))
   })
   
   observeEvent(input$btn_load, {
@@ -124,10 +131,13 @@ server <- function(input, output, session){
   })
   
   observe({
+    
+    my_filters$reactive(input)
     rv$data_filtered <- my_filters$apply(mtcars)
+    print(nrow(rv$data_filtered))
   })
   
-
+  
   
   output$filterused <- renderText({
     
@@ -164,8 +174,15 @@ server <- function(input, output, session){
     
   })
   
+}
 
+ui <- fluidPage(
+  testmoduleUI("test1")
+)
+
+server <- function(input, output, session){
   
+  callModule(testmodule, "test1")
 }
 
 shinyApp(ui, server)

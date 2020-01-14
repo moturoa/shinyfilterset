@@ -5,7 +5,7 @@
 \alias{data_filter}
 \title{Define a filter set}
 \usage{
-shinyfilterset(..., id = NULL)
+shinyfilterset(..., id = NULL, all_data_on_null = TRUE)
 
 data_filter(
   id = NULL,

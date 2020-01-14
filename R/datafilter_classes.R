@@ -16,13 +16,13 @@
 #' @importFrom dplyr filter
 #' @importFrom rlang sym
 #' @importFrom uuid UUIDgenerate
-shinyfilterset <- function(..., id = NULL){
+shinyfilterset <- function(..., id = NULL, all_data_on_null = TRUE){
   
   if(is.null(id)){
     id <- uuid::UUIDgenerate()
   }
   
-  DataFilterSet$new(..., id = id)
+  DataFilterSet$new(..., id = id, all_data_on_null = all_data_on_null)
   
 }
 
@@ -96,10 +96,12 @@ DataFilterSet <- R6::R6Class(
     filters = NULL,
     history = c(),
     ns = NS(NULL),
+    all_data_on_null = NULL,
     last_filter = "",
-    initialize = function(..., id){
+    initialize = function(..., id, all_data_on_null){
       
       self$id <- id
+      self$all_data_on_null <- all_data_on_null
       
       args <- list(...)
       if(inherits(args[[1]], "filter_section")){
@@ -235,7 +237,7 @@ DataFilterSet <- R6::R6Class(
       for(i in seq_along(nms)){
         
         filt <- self$filters[[nms[i]]]
-        empt[i] <- is_empty(input[[filt$id]])
+        suppressWarnings(empt[i] <- is_empty(input[[filt$id]]))
         
         if(!empt[i]){
           data <- apply_filter(data, 
@@ -246,7 +248,10 @@ DataFilterSet <- R6::R6Class(
       }
       
       # If all filters are NULL or empty, return no data at all.
-      if(all(empt))data <- data[0,]
+      if(!self$all_data_on_null){
+        if(all(empt))data <- data[0,]  
+      }
+      
       
     return(data)
     }

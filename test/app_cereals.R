@@ -30,7 +30,7 @@ cereal_filters <- shinyfilterset(
 )
 
 # Filters: start with nothing, build up
-cereal_filters_back <- shinyfilterset(
+cereal_filters_back <- shinyfilterset(all_data_on_null = FALSE,
   data_filter(column_data = cereals$Manufacturer, 
               column_name = "Manufacturer", 
               filter_ui = "picker", 

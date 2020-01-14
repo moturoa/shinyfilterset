@@ -5,7 +5,7 @@ library(shinyfilterset)
 library(lgrdata)
 data(cereals)
 
-
+# Filters: start with complete dataset, filter down.
 cereal_filters <- shinyfilterset(
   data_filter(column_data = cereals$Manufacturer, 
               column_name = "Manufacturer", 
@@ -27,6 +27,30 @@ cereal_filters <- shinyfilterset(
               column_name = "sugars", 
               filter_ui = "picker", 
               updates = TRUE)
+)
+
+# Filters: start with nothing, build up
+cereal_filters_back <- shinyfilterset(
+  data_filter(column_data = cereals$Manufacturer, 
+              column_name = "Manufacturer", 
+              filter_ui = "picker", 
+              updates = FALSE, options = list(selected = NULL)),
+  data_filter(column_data = cereals$calories, 
+              column_name = "calories", 
+              filter_ui = "picker", 
+              updates = FALSE, options = list(selected = NULL)),
+  data_filter(column_data = cereals$sodium, 
+              column_name = "sodium", 
+              filter_ui = "picker", 
+              updates = FALSE, options = list(selected = NULL)),
+  data_filter(column_data = cereals$protein, 
+              column_name = "protein", 
+              filter_ui = "picker", 
+              updates = FALSE, options = list(selected = NULL)),
+  data_filter(column_data = cereals$sugars, 
+              column_name = "sugars", 
+              filter_ui = "picker", 
+              updates = FALSE, options = list(selected = NULL))
 )
 
 
@@ -51,9 +75,9 @@ server <- function(input, output, session) {
   )
   
   observe({
-    rv$data_filtered <- cereal_filters$apply(cereals)
+    rv$data_filtered <- cereal_filters_back$apply(cereals)
     
-    cereal_filters$update(session, rv$data_filtered, input)
+    cereal_filters_back$update(session, rv$data_filtered, input)
   })
   
   output$cereal_rows <- renderText({
@@ -63,7 +87,7 @@ server <- function(input, output, session) {
   output$cereal_filters <- renderUI({
     input$btn_reset_filters
     
-    cereal_filters$ui()
+    cereal_filters_back$ui()
   })
   
   output$cereal_filtered <- renderTable({

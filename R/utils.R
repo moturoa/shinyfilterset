@@ -15,3 +15,15 @@ make_choices <- function(x){
   names(vals) <- paste0(vals, " (",tab,")")
 vals
 }
+
+is_empty <- function(x){
+  if(is.null(x))return(TRUE)
+  
+  if(length(x) == 1){
+    out <- is.null(x) || x == ""
+    out || is.na(out)  
+  } else {
+    sapply(x, is_empty)
+  }
+  
+}

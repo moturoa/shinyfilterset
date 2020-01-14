@@ -230,15 +230,23 @@ DataFilterSet <- R6::R6Class(
     module_server = function(input, output, session, data, filters){
       
       nms <- names(self$filters)
+      empt <- c()
       
       for(i in seq_along(nms)){
         
         filt <- self$filters[[nms[i]]]
-        data <- apply_filter(data, 
-                             value = input[[filt$id]],
-                             object = filt)
+        empt[i] <- is_empty(input[[filt$id]])
+        
+        if(!empt[i]){
+          data <- apply_filter(data, 
+                               value = input[[filt$id]],
+                               object = filt)  
+        }
         
       }
+      
+      # If all filters are NULL or empty, return no data at all.
+      if(all(empt))data <- data[0,]
       
     return(data)
     }

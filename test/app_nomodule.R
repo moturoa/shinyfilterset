@@ -116,10 +116,7 @@ server <- function(input, output, session){
     
     fils <- readRDS(input$sel_load)
     
-    my_filters$reset(session, input)
-    for(i in seq_along(fils)){
-      my_filters$set_value(session, input, names(fils)[i], fils[[i]])
-    }
+    my_filters$load(session, input, fils)
     
   })
   

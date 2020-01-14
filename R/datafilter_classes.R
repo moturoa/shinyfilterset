@@ -223,6 +223,16 @@ DataFilterSet <- R6::R6Class(
         x$reset(session = session, input = input, id = self$get_id(x$column_name))
       })
       
+    },
+    
+    load = function(session, input, vals){
+      
+      self$reset(session, input)
+      
+      for(i in seq_along(vals)){
+        self$set_value(session, input, names(vals)[i], vals[[i]])
+      }
+      
     }
     
   ),

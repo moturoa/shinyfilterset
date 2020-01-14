@@ -9,37 +9,51 @@ update_slider <- function(session, id, self, data, input){
 
 update_select <- function(session, id, self, data, input){
   
-  val <- unique(data)
+  if(is.null(input[[id]]))return(NULL)
   
-  oldval <- input[[id]]
+  if(is.null(self$n_label)){
+    val <- sort(unique(data))
+  } else {
+    val <- make_choices(data)
+  }
 
   if(!is.null(oldval)){
-    shiny::updateSelectInput(session, id, choices = val, selected = oldval)
+    shiny::updateSelectInput(session, id, choices = val, selected = input[[id]])
   }
   
+  
+}
+
+
+update_picker <- function(session, id, self, data, input){
+  
+  if(is.null(input[[id]]))return(NULL)
+  
+  if(is.null(self$n_label)){
+    val <- sort(unique(data))
+  } else {
+    val <- make_choices(data)
+  }
+  
+  shinyWidgets::updatePickerInput(session, id, choices = val, selected = input[[id]])
   
 }
 
 update_checkboxes <- function(session, id, self, data, input){
   
-  val <- unique(data)
+  if(is.null(input[[id]]))return(NULL)
   
-  oldval <- input[[id]]
-  
-  if(!is.null(oldval)){
-    shiny::updateCheckboxGroupInput(session, id, choices = val, selected = oldval)
+  if(is.null(self$n_label)){
+    val <- sort(unique(data))
+  } else {
+    val <- make_choices(data)
   }
-
+  
+  shiny::updateCheckboxGroupInput(session, id, choices = val, selected = input[[id]])
   
 }
 
-update_picker <- function(session, id, self, data, input){
-  
-  val <- unique(data)
-  
-  shinyWidgets::updatePickerInput(session, id, choices = val)
-  
-}
+
 
 update_numeric_min <- function(session, id, self, data, input){
   

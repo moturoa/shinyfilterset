@@ -1,7 +1,7 @@
 Package: shinyfilterset
 Type: Package
 Title: An R6 Class for Collections of Data Filters in Shiny Applications
-Version: 0.3.2
+Version: 0.3.3
 Author: Remko Duursma
 Depends: shinyWidgets, shiny, uuid, R6
 Maintainer: Remko Duursma <remko@shintolabs.nl>
@@ -9,4 +9,4 @@ Description: Define collections of data filters (sliders, pickers, etc.) with a 
     data with ease. 
 License: CC0
 Encoding: UTF-8
-RoxygenNote: 6.1.1
+RoxygenNote: 7.0.2

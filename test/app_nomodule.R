@@ -78,6 +78,8 @@ ui <- fluidPage(
                         icon = icon("refresh", lib = "glyphicon")),
            tags$h4("Used filters"),
            textOutput("filterused"),
+           tags$h4("Last filter"),
+           textOutput("lastfilter"),
            tags$h4("Save"),
            textInput("txt_save", "Name filter"),
            shinyjs::disabled(
@@ -103,6 +105,8 @@ server <- function(input, output, session){
   
   observe({
     input$btn_reset_filters
+    
+    my_filters$monitor(input)
     
     output$div_my_filters_1 <- renderUI(my_filters$ui(section = 1))
     output$div_my_filters_2 <- renderUI(my_filters$ui(section = 2))
@@ -143,6 +147,10 @@ server <- function(input, output, session){
       tags$span(" rijen", style = "font-size: 2em;")
     )
     
+  })
+  
+  output$lastfilter <- renderText({
+    my_filters$last_filter
   })
   
   

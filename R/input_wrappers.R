@@ -61,7 +61,13 @@ select_input <- function(id, self, type = c("select","picker")){
     options$multiple <- TRUE
   }
   if(!("choices" %in% names(options))){
-    options$choices <- c(self$all_choice, self$unique)
+    
+    if(is.null(self$n_label)){
+      options$choices <- c(self$all_choice, self$unique)  
+    } else {
+      options$choices <- self$n_label
+    }
+    
   }
   
   options$label <- self$label

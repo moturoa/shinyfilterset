@@ -13,10 +13,13 @@
 #' @export
 #' @rdname datafilterset
 #' @importFrom R6 R6Class
+#' @importFrom dplyr filter
+#' @importFrom rlang sym
+#' @importFrom uuid UUIDgenerate
 shinyfilterset <- function(..., id = NULL){
   
   if(is.null(id)){
-    id <- UUIDgenerate()
+    id <- uuid::UUIDgenerate()
   }
   
   DataFilterSet$new(..., id = id)
@@ -93,6 +96,7 @@ DataFilterSet <- R6::R6Class(
     filters = NULL,
     history = c(),
     ns = NS(NULL),
+    last_filter = "",
     initialize = function(..., id){
       
       self$id <- id
@@ -153,6 +157,21 @@ DataFilterSet <- R6::R6Class(
       })
       
     },
+    
+    
+    monitor = function(input){
+      
+      lapply(self$filters, function(x){
+        
+        observeEvent(input[[self$get_id(x$column_name)]], {
+    
+          self$last_filter <- x$column_name 
+          
+        })
+        
+      })
+    },
+    
     
     used_filters = function(input){
       
@@ -247,6 +266,7 @@ DataFilter <- R6Class(
     update_function = NULL,
     set_function = NULL,
     value_initial = NULL,
+    n_label = NULL,
     
     # DataFilter$new()
     initialize = function(id, 
@@ -256,6 +276,7 @@ DataFilter <- R6Class(
                           filter_ui,
                           updates = NULL,
                           sort = TRUE,
+                          n_label = TRUE,
                           all_choice = NULL,
                           search_method = NULL,
                           options = list()){
@@ -283,6 +304,10 @@ DataFilter <- R6Class(
         self$unique <- unique(column_data)
         if(sort){
           self$unique <- sort(self$unique)
+        }
+        
+        if(n_label){
+          self$n_label <- make_choices(column_data)
         }
         
         self$range <- NULL

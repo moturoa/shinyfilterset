@@ -111,6 +111,8 @@ testmodule <- function(input, output, session){
   observe({
     input$btn_reset_filters
     
+    my_filters$monitor(input)
+    
     output$div_my_filters_1 <- renderUI(my_filters$ui(ns = session$ns, section = 1))
     output$div_my_filters_2 <- renderUI(my_filters$ui(ns = session$ns, section = 2))
   })

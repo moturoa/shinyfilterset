@@ -63,6 +63,7 @@ data_filter <- function(id = NULL,
                         updates = FALSE,
                         sort = TRUE,
                         all_choice = NULL,
+                        n_label = FALSE,
                         search_method = c("equal","regex"),
                         options = list(),
                         ui_section = 1){
@@ -74,11 +75,20 @@ data_filter <- function(id = NULL,
     id <- uuid::UUIDgenerate()
   }
   
+  # dit werkt, maar update vervangt het weer.
+  # ook: werkt niet met non-character (in de filter), tenzij we opslaan dat met mode char
+  # gefilterd moet worden. Dat kan ook problemen geven? Beter dit aan data-zijde doen voorlopig!
+  # if(!missing(na_value)){
+  #   column_data <- as(column_data, class(na_value))
+  #   column_data[is.na(column_data)] <- na_value
+  # }
+   
   DataFilter$new(id = id,
                  column_data = column_data, 
                  column_name = column_name, 
                  filter_ui = filter_ui,
                  updates = updates,
+                 n_label = n_label,
                  all_choice = all_choice,
                  search_method = search_method,
                  options = options,
@@ -257,7 +267,7 @@ DataFilterSet <- R6::R6Class(
         
       }
       
-      # If all filters are NULL or empty, return no data at all.
+      # If set, if all filters are NULL or empty, return no data at all.
       if(!self$all_data_on_null){
         if(all(empt))data <- data[0,]  
       }
@@ -386,8 +396,10 @@ DataFilter <- R6Class(
     #----- Methods
     update = function(session, id, data, input, last_filter = ""){
       
+      
       if(self$updates && !last_filter == self$column_name){
         datavector <- data[[self$column_name]]
+        #print(self$column_name)
         if(!is.null(datavector)){
           do.call(self$update_function,
                   list(session = session, id = id, self = self, data = datavector, input = input)

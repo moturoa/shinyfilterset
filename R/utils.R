@@ -6,15 +6,21 @@ is.Tag <- function(x){
   inherits(x, "shiny.tag")
 }
 
+
 make_choices <- function(x){
   if(is.factor(x)){
     x <- as.character(x)
   }
   tab <- table(x)
+  if(dim(tab) == 0)return(NULL)
+  
   vals <- sort(unique(x))
+  if(all(tab == 1))return(vals)
+  
   names(vals) <- paste0(vals, " (",tab,")")
 vals
 }
+
 
 is_empty <- function(x){
   if(is.null(x))return(TRUE)

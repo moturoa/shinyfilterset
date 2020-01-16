@@ -23,6 +23,7 @@ apply_filter <- function(data, value, object){
         
         # Filter with equality
         if(object$search_method == "equal"){
+          
           data <- dplyr::filter(data, !!sym(colname) %in% value)  
           
           # Filter with regular expression

@@ -18,7 +18,7 @@ set_checkboxes <- function(session, id, self, value){
 
 set_picker <- function(session, id, self, value){
   
-  shinyWidgets::updatePickerInput(session, id, choices = value)
+  shinyWidgets::updatePickerInput(session, id, selected = value)
   
 }
 

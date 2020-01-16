@@ -16,6 +16,7 @@ data_filter(
   updates = FALSE,
   sort = TRUE,
   all_choice = NULL,
+  n_label = FALSE,
   search_method = c("equal", "regex"),
   options = list(),
   ui_section = 1

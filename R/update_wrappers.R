@@ -9,7 +9,7 @@ update_slider <- function(session, id, self, data, input){
 
 update_select <- function(session, id, self, data, input){
   
-  if(is.null(input[[id]]))return(NULL)
+  #if(is.null(input[[id]]))return(NULL)
   
   if(is.null(self$n_label)){
     val <- sort(unique(data))
@@ -27,13 +27,15 @@ update_select <- function(session, id, self, data, input){
 
 update_picker <- function(session, id, self, data, input){
   
-  if(is.null(input[[id]]))return(NULL)
+  #if(is.null(input[[id]]))return(NULL)
   
   if(is.null(self$n_label)){
     val <- sort(unique(data))
   } else {
     val <- make_choices(data)
   }
+  
+  #print(paste(self$column_name, ", n=", length(val)))
   
   shinyWidgets::updatePickerInput(session, id, choices = val, selected = input[[id]])
   

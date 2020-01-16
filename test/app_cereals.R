@@ -5,52 +5,25 @@ library(shinyfilterset)
 library(lgrdata)
 data(cereals)
 
-# Filters: start with complete dataset, filter down.
-cereal_filters <- shinyfilterset(
-  data_filter(column_data = cereals$Manufacturer, 
-              column_name = "Manufacturer", 
-              filter_ui = "picker", 
-              updates = TRUE),
-  data_filter(column_data = cereals$calories, 
-              column_name = "calories", 
-              filter_ui = "picker", 
-              updates = TRUE),
-  data_filter(column_data = cereals$sodium, 
-              column_name = "sodium", 
-              filter_ui = "picker", 
-              updates = TRUE),
-  data_filter(column_data = cereals$protein, 
-              column_name = "protein", 
-              filter_ui = "picker", 
-              updates = TRUE),
-  data_filter(column_data = cereals$sugars, 
-              column_name = "sugars", 
-              filter_ui = "picker", 
-              updates = TRUE)
-)
-
 # Filters: start with nothing, build up
-cereal_filters_back <- shinyfilterset(all_data_on_null = FALSE,
-  data_filter(column_data = cereals$Manufacturer, 
-              column_name = "Manufacturer", 
-              filter_ui = "picker", 
-              updates = FALSE, options = list(selected = NULL)),
-  data_filter(column_data = cereals$calories, 
-              column_name = "calories", 
-              filter_ui = "picker", 
-              updates = FALSE, options = list(selected = NULL)),
-  data_filter(column_data = cereals$sodium, 
-              column_name = "sodium", 
-              filter_ui = "picker", 
-              updates = FALSE, options = list(selected = NULL)),
-  data_filter(column_data = cereals$protein, 
-              column_name = "protein", 
-              filter_ui = "picker", 
-              updates = FALSE, options = list(selected = NULL)),
-  data_filter(column_data = cereals$sugars, 
-              column_name = "sugars", 
-              filter_ui = "picker", 
-              updates = FALSE, options = list(selected = NULL))
+updates <- TRUE
+
+picker <- function(column, data = cereals){
+  data_filter(column_data = data[[column]],
+              column_name = column,
+              filter_ui = "picker",
+              na_value = "Onbekend",
+              updates = TRUE,
+              options = list(selected = NULL)
+  )
+}
+
+cereal_filters_back <- shinyfilterset(all_data_on_null = TRUE, # default TRUE
+  picker("Manufacturer"),
+  picker("calories"),
+  picker("sodium"),
+  picker("protein"),
+  picker("sugars")
 )
 
 
@@ -80,6 +53,11 @@ server <- function(input, output, session) {
     cereal_filters_back$update(session, rv$data_filtered, input)
   })
   
+  observe({
+    cereal_filters_back$reactive(input)
+    cereal_filters_back$update(session, rv$data_filtered, input)
+  })
+
   output$cereal_rows <- renderText({
     paste("N rows: ", nrow(rv$data_filtered))
   })

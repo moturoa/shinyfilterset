@@ -152,7 +152,7 @@ DataFilterSet <- R6::R6Class(
     },
     
     apply = function(data){
-      callModule(private$module_server, 
+      callModule(private$filter_server, 
                  id = self$id,
                  data = data,
                  filters = self$filters)
@@ -160,13 +160,12 @@ DataFilterSet <- R6::R6Class(
     
     update = function(session, data, input, last_filter = ""){
       
-      lapply(self$filters, function(x){
-        x$update(session, 
-                 id = self$get_id(x$column_name), 
-                 data = data, 
-                 input = input, 
-                 last_filter = last_filter)
-      })
+      callModule(private$update_server, 
+                 id = self$id,
+                 data = data,
+                 filters = self$filters,
+                 last_filter = last_filter
+                 )
       
     },
     
@@ -249,7 +248,7 @@ DataFilterSet <- R6::R6Class(
   
   private = list(
     
-    module_server = function(input, output, session, data, filters){
+    filter_server = function(input, output, session, data, filters){
       
       nms <- names(self$filters)
       empt <- c()
@@ -274,7 +273,24 @@ DataFilterSet <- R6::R6Class(
       
       
     return(data)
+    },
+    
+    
+    update_server = function(input, output, session, data, filters, last_filter){
+      
+    
+      lapply(filters, function(x){
+        x$update(session, 
+                 id = self$get_id(x$column_name), 
+                 data = data, 
+                 input = input, 
+                 last_filter = last_filter)
+      })
+      
+      
     }
+    
+    
   )
 )
 

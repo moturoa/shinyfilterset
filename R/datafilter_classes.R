@@ -158,7 +158,7 @@ DataFilterSet <- R6::R6Class(
                  filters = self$filters)
     },
     
-    update = function(session, data, input, last_filter = ""){
+    update = function(data, last_filter = ""){
       
       callModule(private$update_server, 
                  id = self$id,
@@ -166,7 +166,6 @@ DataFilterSet <- R6::R6Class(
                  filters = self$filters,
                  last_filter = last_filter
                  )
-      
     },
     
     
@@ -281,7 +280,7 @@ DataFilterSet <- R6::R6Class(
     
       lapply(filters, function(x){
         x$update(session, 
-                 id = self$get_id(x$column_name), 
+                 id = x$id, #self$get_id(x$column_name), 
                  data = data, 
                  input = input, 
                  last_filter = last_filter)
@@ -346,11 +345,15 @@ DataFilter <- R6Class(
       self$options <- options
       self$filter_ui <- filter_ui
       
+      # Text-based categorical filter
       if(filter_ui %in% c("picker","select","checkboxes")){
+        
         if(is.factor(column_data)){
           column_data <- as.character(column_data)
         }
+        
         self$unique <- unique(column_data)
+        
         if(sort){
           self$unique <- sort(self$unique)
         }
@@ -414,11 +417,17 @@ DataFilter <- R6Class(
       
       
       if(self$updates && !last_filter == self$column_name){
-        datavector <- data[[self$column_name]]
+        
+        column_data <- data[[self$column_name]]
+        
+        if(is.factor(column_data)){
+          column_data <- as.character(column_data)
+        }
+        
         #print(self$column_name)
-        if(!is.null(datavector)){
+        if(!is.null(column_data)){
           do.call(self$update_function,
-                  list(session = session, id = id, self = self, data = datavector, input = input)
+                  list(session = session, id = id, self = self, data = column_data, input = input)
           )
         }
       }

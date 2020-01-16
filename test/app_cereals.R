@@ -13,6 +13,7 @@ picker <- function(column, data = cereals){
               column_name = column,
               filter_ui = "picker",
               updates = TRUE,
+              n_label = TRUE,
               options = list(selected = NULL)
   )
 }
@@ -32,11 +33,12 @@ ui <- fluidPage(
   fluidRow(
     column(6, 
            uiOutput("cereal_filters"),
-           actionButton("btn_reset_filters","Reset")
+           actionButton("btn_reset_filters","Reset",class="btn-primary")
            ),
     column(6,
-           textOutput("cereal_rows"),
+           uiOutput("cereal_rows"),
            hr(),
+           tags$h4("Gefilterde data"),
            tableOutput("cereal_filtered")
            )
   )
@@ -51,16 +53,16 @@ server <- function(input, output, session) {
   observe({
     rv$data_filtered <- cereal_filters_back$apply(cereals)
     
-    cereal_filters_back$update(session, rv$data_filtered, input)
+    cereal_filters_back$update(rv$data_filtered)
   })
   
   observe({
     cereal_filters_back$reactive(input)
-    cereal_filters_back$update(session, rv$data_filtered, input)
+    cereal_filters_back$update(rv$data_filtered)
   })
 
-  output$cereal_rows <- renderText({
-    paste("N rows: ", nrow(rv$data_filtered))
+  output$cereal_rows <- renderUI({
+    tags$h2(paste("Aantal rijen: ", nrow(rv$data_filtered)))
   })
   
   output$cereal_filters <- renderUI({

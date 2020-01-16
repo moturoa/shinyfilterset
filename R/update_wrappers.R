@@ -35,8 +35,6 @@ update_picker <- function(session, id, self, data, input){
     val <- make_choices(data)
   }
   
-  #print(paste(self$column_name, ", n=", length(val)))
-  
   shinyWidgets::updatePickerInput(session, id, choices = val, selected = input[[id]])
   
 }

@@ -12,11 +12,12 @@ picker <- function(column, data = cereals){
   data_filter(column_data = data[[column]],
               column_name = column,
               filter_ui = "picker",
-              na_value = "Onbekend",
               updates = TRUE,
+              n_label = TRUE,
               options = list(selected = NULL)
   )
 }
+
 
 cereal_filters_back <- shinyfilterset(all_data_on_null = TRUE, # default TRUE
   picker("Manufacturer"),

@@ -63,7 +63,7 @@ data_filter <- function(id = NULL,
                         updates = FALSE,
                         sort = TRUE,
                         all_choice = NULL,
-                        n_label = FALSE,
+                        n_label = TRUE,
                         search_method = c("equal","regex"),
                         options = list(),
                         ui_section = 1){
@@ -74,14 +74,7 @@ data_filter <- function(id = NULL,
   if(is.null(id)){
     id <- uuid::UUIDgenerate()
   }
-  
-  # dit werkt, maar update vervangt het weer.
-  # ook: werkt niet met non-character (in de filter), tenzij we opslaan dat met mode char
-  # gefilterd moet worden. Dat kan ook problemen geven? Beter dit aan data-zijde doen voorlopig!
-  # if(!missing(na_value)){
-  #   column_data <- as(column_data, class(na_value))
-  #   column_data[is.na(column_data)] <- na_value
-  # }
+
    
   DataFilter$new(id = id,
                  column_data = column_data, 
@@ -99,12 +92,13 @@ data_filter <- function(id = NULL,
 
 # Class definition: a set of filters.
 DataFilterSet <- R6::R6Class(
+  
   classname = "datafilterset",
+  
   public = list(
     id = NULL,
     elements = NULL,
     filters = NULL,
-    history = c(),
     ns = NS(NULL),
     all_data_on_null = NULL,
     last_filter = "",
@@ -152,104 +146,52 @@ DataFilterSet <- R6::R6Class(
     },
     
     apply = function(data){
-      callModule(private$module_server, 
+      out <- callModule(private$filter_server, 
+                 id = self$id,
+                 data = data)
+      
+      self$update(out)
+      
+    return(out)
+    },
+    
+    update = function(data, last_filter = ""){
+      
+      callModule(private$update_server, 
                  id = self$id,
                  data = data,
-                 filters = self$filters)
+                 last_filter = last_filter
+                 )
     },
+
     
-    update = function(session, data, input, last_filter = ""){
+    load = function(vals){
       
-      lapply(self$filters, function(x){
-        x$update(session, 
-                 id = self$get_id(x$column_name), 
-                 data = data, 
-                 input = input, 
-                 last_filter = last_filter)
-      })
-      
-    },
-    
-    
-    monitor = function(input){
-      
-      lapply(self$filters, function(x){
-        
-        observeEvent(input[[self$get_id(x$column_name)]], {
-    
-          self$last_filter <- x$column_name 
-          
-        })
-        
-      })
-    },
-    
-    
-    used_filters = function(input){
-      
-      chk <- sapply(names(self$filters), function(x){
-        !isTRUE(all.equal(as.character(self$get_value(input, x)), 
-                          as.character(self$filters[[x]]$value_initial)))
-      })
-      
-      fils <- names(self$filters)[chk]
-      vals <- lapply(fils, function(x)self$get_value(input, x))
-      names(vals) <- fils
-      
-      return(vals)
-    },
-    
-    reactive = function(input){
-      
-      lapply(names(self$filters), function(x){
-        self$get_value(input, x)
-      })
+      callModule(private$load_server, 
+                 id = self$id,
+                 vals = vals
+      )
       
     },
     
-    
-    get_id = function(name){
+    used_filters = function(){
       
-      NS(self$id)(self$filters[[name]]$id)
-      
-    },
-    
-    get_value = function(input, name){
-      
-      input[[self$get_id(name)]]
+      callModule(private$used_filters_server, self$id)
       
     },
     
-    set_value = function(session, input, name, val){
+    reactive = function(){
       
-      self$filters[[name]]$set(session, id = self$get_id(name), val, input)
-      
-    },
-    
-    # resets values (selections etc.), not choices, min-max, labels.
-    reset = function(session, input){
-      
-      lapply(self$filters, function(x){
-        x$reset(session = session, input = input, id = self$get_id(x$column_name))
-      })
-      
-    },
-    
-    load = function(session, input, vals){
-      
-      self$reset(session, input)
-      
-      for(i in seq_along(vals)){
-        self$set_value(session, input, names(vals)[i], vals[[i]])
-      }
+      callModule(private$reactive_server, self$id)
       
     }
-    
+
   ),
   
   private = list(
     
-    module_server = function(input, output, session, data, filters){
+
+    filter_server = function(input, output, session, data){
       
       nms <- names(self$filters)
       empt <- c()
@@ -274,7 +216,54 @@ DataFilterSet <- R6::R6Class(
       
       
     return(data)
+    },
+    
+    
+    update_server = function(input, output, session, data, last_filter){
+      
+      lapply(self$filters, function(x){
+        x$update(session, 
+                 id = x$id, 
+                 data = data, 
+                 input = input, 
+                 last_filter = last_filter)
+      })
+      
+      
+    },
+    
+    load_server = function(input, output, session, vals){
+      
+      for(i in seq_along(vals)){
+        filt <- self$filters[[names(vals)[i]]]
+        filt$set(session, id = filt$id, vals[[i]])
+      }
+      
+    },
+    
+    reactive_server = function(input, output, session){
+      
+      lapply(self$filters, function(x){
+        input[[x$id]]
+      })
+      
+    },
+    
+    used_filters_server = function(input, output, session){
+      
+      chk <- sapply(self$filters, function(x){
+        !isTRUE(all.equal(as.character(input[[x$id]]), 
+                          as.character(x$value_initial)))
+      })
+      
+      fils <- names(self$filters)[chk]
+      vals <- lapply(self$filters[fils], function(x)input[[x$id]])
+      
+      return(vals)
+      
     }
+    
+    
   )
 )
 
@@ -330,11 +319,15 @@ DataFilter <- R6Class(
       self$options <- options
       self$filter_ui <- filter_ui
       
+      # Text-based categorical filter
       if(filter_ui %in% c("picker","select","checkboxes")){
+        
         if(is.factor(column_data)){
           column_data <- as.character(column_data)
         }
+        
         self$unique <- unique(column_data)
+        
         if(sort){
           self$unique <- sort(self$unique)
         }
@@ -398,18 +391,24 @@ DataFilter <- R6Class(
       
       
       if(self$updates && !last_filter == self$column_name){
-        datavector <- data[[self$column_name]]
+        
+        column_data <- data[[self$column_name]]
+        
+        if(is.factor(column_data)){
+          column_data <- as.character(column_data)
+        }
+        
         #print(self$column_name)
-        if(!is.null(datavector)){
+        if(!is.null(column_data)){
           do.call(self$update_function,
-                  list(session = session, id = id, self = self, data = datavector, input = input)
+                  list(session = session, id = id, self = self, data = column_data, input = input)
           )
         }
       }
       
     },
     
-    set = function(session, id, val, input){
+    set = function(session, id, val){
       
       do.call(self$set_function,
               list(session = session, id = id, self = self, value = val)
@@ -417,13 +416,13 @@ DataFilter <- R6Class(
       
     },
     
-    reset = function(session, input, id){
-      
-      do.call(self$set_function,
-              list(session = session, id = id, self = self, value = self$value_initial)
-      )
-      
-    },
+    # reset = function(session, input, id){
+    #   
+    #   do.call(self$set_function,
+    #           list(session = session, id = id, self = self, value = self$value_initial)
+    #   )
+    #   
+    # },
     
     ui = function(ns = NS(NULL)){
       

@@ -29,9 +29,9 @@ my_filters <- shinyfilterset(
                              options = list(label = "Select disp value")),
                  data_filter(column_data = mtcars$gear, 
                              column_name = "gear", 
-                             filter_ui = "select",
+                             filter_ui = "picker",
                              updates = TRUE,
-                             options = list(label = "Select gear"))               
+                             options = list(label = "Select gear", selected = NULL))               
                  
   ),
   filter_section(2,
@@ -40,16 +40,16 @@ my_filters <- shinyfilterset(
                  data_filter(column_data = mtcars$cyl, 
                              column_name = "cyl", 
                              filter_ui = "numeric_min",
-                             updates = FALSE,
+                             updates = TRUE,
                              options = list(label = "Select cyl")),
                  data_filter(column_name = "binary1", 
                              filter_ui = "switch", 
-                             updates = FALSE,
+                             updates = TRUE,
                              options = list(status = "primary")),
                  data_filter(column_data = mtcars$binary2, 
                              column_name = "binary2", 
                              filter_ui = "checkboxes",
-                             updates = FALSE,
+                             updates = TRUE,
                              options = list(choices = c("Ja" = TRUE, "Nee" = FALSE), 
                                             selected = c(TRUE,FALSE), inline = TRUE))             
                  
@@ -74,10 +74,6 @@ testmoduleUI <- function(id){
                actionButton(ns("btn_reset_filters"), "Reset", 
                             icon = icon("refresh", lib = "glyphicon"), class = "btn btn-primary"),
                
-               actionButton(ns("updateslider"), "Update"),
-               actionButton(ns("browse"),"browser()"),
-               actionButton(ns("btn_reset_filters2"), "Reset (2)", 
-                            icon = icon("refresh", lib = "glyphicon")),
                tags$h4("Used filters"),
                textOutput(ns("filterused")),
                tags$h4("Save"),
@@ -103,54 +99,28 @@ testmoduleUI <- function(id){
 
 testmodule <- function(input, output, session){ 
   
-  rv <- reactiveValues(
-    data_filtered = NULL,
-    last_filter = NULL
-  )
-  
   observe({
     input$btn_reset_filters
-    
-    my_filters$monitor(input)
     
     output$div_my_filters_1 <- renderUI(my_filters$ui(ns = session$ns, section = 1))
     output$div_my_filters_2 <- renderUI(my_filters$ui(ns = session$ns, section = 2))
   })
   
-  # observe({
-  #   
-  #   my_filters$reactive(input)
-  #   #my_filters$update(session, isolate(rv$data_filtered), input)
-  #   print("reacted")
-  # })
-  
+
   observeEvent(input$btn_load, {
     
     fils <- readRDS(input$sel_load)
-    
-    my_filters$reset(session, input)
-    for(i in seq_along(fils)){
-      my_filters$set_value(session, input, names(fils)[i], fils[[i]])
-    }
+    my_filters$load(fils)
     
   })
   
-  observeEvent(input$btn_reset_filters2, {
-    my_filters$reset(session, input)
+  data_filtered <- reactive({
+    my_filters$apply(mtcars)
   })
-  
-  observe({
     
-    rv$data_filtered <- my_filters$apply(mtcars)
-    
-    my_filters$update(session, rv$data_filtered, input)
-    print("filtered")
-  })
-  
-  
   output$filterused <- renderText({
     
-    fils <- my_filters$used_filters(input)
+    fils <- my_filters$used_filters()
     paste(names(fils), collapse=", ")
     
   })
@@ -158,13 +128,11 @@ testmodule <- function(input, output, session){
   output$data_out <- renderUI({
     
     tagList(  
-      tags$span(nrow(rv$data_filtered), style = "font-size: 10em;"),
+      tags$span(nrow(data_filtered()), style = "font-size: 10em;"),
       tags$span(" rijen", style = "font-size: 2em;")
     )
     
   })
-  
-  observeEvent(input$browse, browser())
   
   observe({
     toggleState("btn_save", input$txt_save != "")
@@ -176,7 +144,7 @@ testmodule <- function(input, output, session){
   
   observeEvent(input$btn_save, {
     
-    fils <- my_filters$used_filters(input)
+    fils <- my_filters$used_filters()
     saveRDS(fils, paste0(file.path("data", input$txt_save), ".rds"))
     
   })

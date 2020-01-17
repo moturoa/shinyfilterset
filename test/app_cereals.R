@@ -18,7 +18,7 @@ picker <- function(column, data = cereals){
   )
 }
 
-cereal_filters_back <- shinyfilterset(
+cereal_filters <- shinyfilterset(
   all_data_on_null = TRUE, # default TRUE
   
   picker("Manufacturer"),
@@ -33,7 +33,7 @@ ui <- fluidPage(
   fluidRow(
     column(6, 
            uiOutput("cereal_filters"),
-           actionButton("btn_reset_filters","Reset",class="btn-primary")
+           actionButton("btn_reset_filters","Reset", class="btn-primary")
            ),
     column(6,
            uiOutput("cereal_rows"),
@@ -51,14 +51,14 @@ server <- function(input, output, session) {
   )
   
   observe({
-    rv$data_filtered <- cereal_filters_back$apply(cereals)
+    rv$data_filtered <- cereal_filters$apply(cereals)
     
-    cereal_filters_back$update(rv$data_filtered)
+    cereal_filters$update(rv$data_filtered)
   })
   
   observe({
-    cereal_filters_back$reactive(input)
-    cereal_filters_back$update(rv$data_filtered)
+    cereal_filters$reactive()
+    cereal_filters$update(rv$data_filtered)
   })
 
   output$cereal_rows <- renderUI({
@@ -68,7 +68,7 @@ server <- function(input, output, session) {
   output$cereal_filters <- renderUI({
     input$btn_reset_filters
     
-    cereal_filters_back$ui()
+    cereal_filters$ui()
   })
   
   output$cereal_filtered <- renderTable({

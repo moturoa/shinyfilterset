@@ -234,9 +234,14 @@ DataFilterSet <- R6::R6Class(
     
     load_server = function(input, output, session, vals){
       
+      #lapply(self$filters, function(x)x$reset(session, input, x$id))
+      
       for(i in seq_along(vals)){
         filt <- self$filters[[names(vals)[i]]]
-        filt$set(session, id = filt$id, vals[[i]])
+        if(!is.null(filt)){
+          filt$set(session, id = filt$id, vals[[i]])  
+        }
+        
       }
       
     },
@@ -416,13 +421,13 @@ DataFilter <- R6Class(
       
     },
     
-    # reset = function(session, input, id){
-    #   
-    #   do.call(self$set_function,
-    #           list(session = session, id = id, self = self, value = self$value_initial)
-    #   )
-    #   
-    # },
+    reset = function(session, input, id){
+
+      do.call(self$set_function,
+              list(session = session, id = id, self = self, value = self$value_initial)
+      )
+
+    },
     
     ui = function(ns = NS(NULL)){
       

@@ -11,13 +11,15 @@ data_filter(
   id = NULL,
   column_data,
   column_name,
-  filter_ui = c("picker", "select", "checkboxes", "numeric_min", "slider",
-    "numeric_max", "numeric_range", "switch"),
+  filter_ui = c("picker", "select", "checkboxes", "slider", "numeric_range",
+    "numeric_min", "numeric_max", "switch"),
   updates = FALSE,
   sort = TRUE,
   all_choice = NULL,
   n_label = TRUE,
   search_method = c("equal", "regex"),
+  array_field = FALSE,
+  array_separator = ";",
   options = list(),
   ui_section = 1
 )

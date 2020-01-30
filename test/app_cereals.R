@@ -48,6 +48,7 @@ server <- function(input, output, session) {
   
   
   data_filtered <- reactive({
+    print("applying filters")
     cereal_filters$apply(cereals)
   })
   
@@ -58,7 +59,7 @@ server <- function(input, output, session) {
   
   output$cereal_filters <- renderUI({
     input$btn_reset_filters
-    
+    print("filter UI")
     cereal_filters$ui()
   })
   

@@ -1,5 +1,7 @@
 update_slider <- function(session, id, self, data, input){
   
+  data <- data[!is.na(data)]
+  if(length(data) == 0)browser()
   val <- range(data, na.rm=TRUE)
   
   shiny::updateSliderInput(session, id, value = val)
@@ -11,45 +13,29 @@ update_select <- function(session, id, self, data, input){
   
   #if(is.null(input[[id]]))return(NULL)
   
-  if(is.null(self$n_label)){
-    val <- sort(unique(data))
-  } else {
-    val <- make_choices(data)
-  }
+  vals <- make_choices(data, self$n_label, self$sort, self$array_field, self$array_separator,
+                       selected = input[[id]])
 
-  if(!is.null(oldval)){
-    shiny::updateSelectInput(session, id, choices = val, selected = input[[id]])
-  }
-  
+  shiny::updateSelectInput(session, id, choices = vals, selected = input[[id]])
   
 }
 
 
 update_picker <- function(session, id, self, data, input){
   
-  #if(is.null(input[[id]]))return(NULL)
+  vals <- make_choices(data, self$n_label, self$sort, self$array_field, self$array_separator,
+                       selected = input[[id]])
   
-  if(is.null(self$n_label)){
-    val <- sort(unique(data))
-  } else {
-    val <- make_choices(data)
-  }
-  
-  shinyWidgets::updatePickerInput(session, id, choices = val, selected = input[[id]])
+  shinyWidgets::updatePickerInput(session, id, choices = vals, selected = input[[id]])
   
 }
 
 update_checkboxes <- function(session, id, self, data, input){
   
-  if(is.null(input[[id]]))return(NULL)
+  vals <- make_choices(data, self$n_label, self$sort, self$array_field, self$array_separator,
+                       selected = input[[id]])
   
-  if(is.null(self$n_label)){
-    val <- sort(unique(data))
-  } else {
-    val <- make_choices(data)
-  }
-  
-  shiny::updateCheckboxGroupInput(session, id, choices = val, selected = input[[id]])
+  shiny::updateCheckboxGroupInput(session, id, choices = vals, selected = input[[id]])
   
 }
 
@@ -57,6 +43,8 @@ update_checkboxes <- function(session, id, self, data, input){
 
 update_numeric_min <- function(session, id, self, data, input){
   
+  data <- data[!is.na(data)]
+  if(length(data) == 0)browser()
   val <- min(data, na.rm=TRUE)
   
   shiny::updateNumericInput(session, id, value = val)
@@ -66,6 +54,8 @@ update_numeric_min <- function(session, id, self, data, input){
 
 update_numeric_max <- function(session, id, self, data, input){
   
+  data <- data[!is.na(data)]
+  if(length(data) == 0)browser()
   val <- max(data, na.rm=TRUE)
   
   shiny::updateNumericInput(session, id, value = val)
@@ -75,6 +65,8 @@ update_numeric_max <- function(session, id, self, data, input){
 
 update_range <- function(session, id, self, data, input){
   
+  data <- data[!is.na(data)]
+  if(length(data) == 0)browser()
   val <- range(data, na.rm=TRUE)
   
   # !! apparently updateNumericRangeInput has a bug that we have to re-set the label.

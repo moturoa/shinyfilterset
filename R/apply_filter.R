@@ -24,7 +24,13 @@ apply_filter <- function(data, value, object){
         # Filter with equality
         if(object$search_method == "equal"){
           
-          data <- dplyr::filter(data, !!sym(colname) %in% value)  
+          if(!object$array_field){
+            data <- dplyr::filter(data, !!sym(colname) %in% value)    
+          } else {
+            data <- dplyr::filter(data, search_array(!!sym(colname), 
+                                                     what = value, 
+                                                     array_separator = object$array_separator))
+          }
           
           # Filter with regular expression
         } else if(object$search_method == "regex"){

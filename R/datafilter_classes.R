@@ -22,7 +22,7 @@ shinyfilterset <- function(..., id = NULL, all_data_on_null = TRUE){
     id <- uuid::UUIDgenerate()
   }
   
-  DataFilterSet$new(..., id = id, all_data_on_null = all_data_on_null)
+  DataFilterSet$new(..., id = id, all_data_on_null = all_data_on_null) 
   
 }
 
@@ -57,14 +57,26 @@ filter_section <- function(section_nr = 1, ...){
 data_filter <- function(id = NULL, 
                         column_data, 
                         column_name, 
-                        filter_ui = c("picker","select","checkboxes",
-                                      "numeric_min","slider",
-                                      "numeric_max","numeric_range","switch"), 
-                        updates = FALSE,
-                        sort = TRUE,
-                        all_choice = NULL,
-                        n_label = TRUE,
-                        search_method = c("equal","regex"),
+                        filter_ui = c("picker",   # category
+                                      "select",
+                                      "checkboxes",
+                                      
+                                      "slider",    # range
+                                      "numeric_range",
+                                      
+                                      "numeric_min",  # minimum
+                                      "numeric_max",  # maximum
+                                      
+                                      "switch"), 
+                        updates = FALSE,   # for slider update min/max for bug avoidance??
+                        
+                        sort = TRUE,   # category only
+                        all_choice = NULL,  # category only
+                        n_label = TRUE,  # category only
+                        search_method = c("equal","regex"),  # category only
+                        array_field = FALSE,  # category only
+                        array_separator = ";",  # category only
+                        
                         options = list(),
                         ui_section = 1){
   
@@ -83,6 +95,8 @@ data_filter <- function(id = NULL,
                  updates = updates,
                  n_label = n_label,
                  all_choice = all_choice,
+                 array_field = array_field,
+                 array_separator = array_separator,
                  search_method = search_method,
                  options = options,
                  ui_section = ui_section)
@@ -229,12 +243,9 @@ DataFilterSet <- R6::R6Class(
                  last_filter = last_filter)
       })
       
-      
     },
     
     load_server = function(input, output, session, vals){
-      
-      #lapply(self$filters, function(x)x$reset(session, input, x$id))
       
       for(i in seq_along(vals)){
         filt <- self$filters[[names(vals)[i]]]
@@ -261,8 +272,7 @@ DataFilterSet <- R6::R6Class(
                           as.character(x$value_initial)))
       })
       
-      fils <- names(self$filters)[chk]
-      vals <- lapply(self$filters[fils], function(x)input[[x$id]])
+      vals <- lapply(self$filters[chk], function(x)input[[x$id]])
       
       return(vals)
       
@@ -294,6 +304,9 @@ DataFilter <- R6Class(
     set_function = NULL,
     value_initial = NULL,
     n_label = NULL,
+    sort = NULL,
+    array_field = NULL,
+    array_separator = NULL,
     
     # DataFilter$new()
     initialize = function(id, 
@@ -305,6 +318,8 @@ DataFilter <- R6Class(
                           sort = TRUE,
                           n_label = TRUE,
                           all_choice = NULL,
+                          array_field = FALSE,
+                          array_separator = ";",
                           search_method = NULL,
                           options = list()){
       
@@ -314,6 +329,11 @@ DataFilter <- R6Class(
       self$all_choice <- all_choice
       self$search_method <- search_method
       self$updates <- updates
+      
+      self$n_label <- n_label
+      self$sort <- sort
+      self$array_field <- array_field
+      self$array_separator <- array_separator
       
       if(!("label" %in% names(options))){
         self$label <- self$column_name
@@ -330,16 +350,8 @@ DataFilter <- R6Class(
         if(is.factor(column_data)){
           column_data <- as.character(column_data)
         }
-        
-        self$unique <- unique(column_data)
-        
-        if(sort){
-          self$unique <- sort(self$unique)
-        }
-        
-        if(n_label){
-          self$n_label <- make_choices(column_data)
-        }
+ 
+        self$unique <- make_choices(column_data, n_label, sort, array_field, array_separator)
         
         self$range <- NULL
       } else if(filter_ui %in% c("slider","numeric_min","numeric_max","numeric_range")){
@@ -399,6 +411,7 @@ DataFilter <- R6Class(
         
         column_data <- data[[self$column_name]]
         
+        # hier niet nodig? zie update functions
         if(is.factor(column_data)){
           column_data <- as.character(column_data)
         }

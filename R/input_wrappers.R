@@ -51,7 +51,7 @@ select_input <- function(id, self, type = c("select","picker")){
   
   if(!("selected" %in% names(options))){
     
-    options$selected <- self$unique
+    options$selected <- NULL
     
     if(!is.null(self$all_choice)){
       options$selected <- self$all_choice
@@ -87,7 +87,7 @@ checkboxes_input <- function(id, self){
   
   if(self$filter_ui == "checkboxes"){
     if(!("selected" %in% names(options))){
-      options$selected <- NULL #self$unique
+      options$selected <- NULL
     }
     if(!("choices" %in% names(options))){
       options$choices <- self$unique

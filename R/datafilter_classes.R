@@ -16,13 +16,13 @@
 #' @importFrom dplyr filter
 #' @importFrom rlang sym
 #' @importFrom uuid UUIDgenerate
-shinyfilterset <- function(..., id = NULL, all_data_on_null = TRUE){
+shinyfilterset <- function(..., data = NULL, id = NULL, all_data_on_null = TRUE){
   
   if(is.null(id)){
     id <- uuid::UUIDgenerate()
   }
   
-  DataFilterSet$new(..., id = id, all_data_on_null = all_data_on_null) 
+  DataFilterSet$new(..., data = data, id = id, all_data_on_null = all_data_on_null) 
   
 }
 
@@ -54,9 +54,7 @@ filter_section <- function(section_nr = 1, ...){
 #' @param options
 #' @rdname datafilterset
 #' @export
-data_filter <- function(id = NULL, 
-                        column_data, 
-                        column_name, 
+data_filter <- function(column_name, 
                         filter_ui = c("picker",   # category
                                       "select",
                                       "checkboxes",
@@ -68,18 +66,18 @@ data_filter <- function(id = NULL,
                                       "numeric_max",  # ... maximum
                                       
                                       "switch"), 
-                        updates = FALSE,   # for slider update min/max for bug avoidance??
-                        
+                        updates = TRUE,
                         sort = TRUE,   # category only
                         all_choice = NULL,  # category only
                         n_label = TRUE,  # category only
                         search_method = c("equal","regex"),  # category only
                         array_field = FALSE,  # category only
                         array_separator = ";",  # category only
-                        numeric_breaks = NULL,
                         
+                        # sent to input method
                         options = list(),
-                        ui_section = 1){
+                        ui_section = 1,
+                        id = NULL){
   
   filter_ui <- match.arg(filter_ui)
   search_method <- match.arg(search_method)
@@ -90,7 +88,6 @@ data_filter <- function(id = NULL,
 
    
   DataFilter$new(id = id,
-                 column_data = column_data, 
                  column_name = column_name, 
                  filter_ui = filter_ui,
                  updates = updates,
@@ -99,7 +96,7 @@ data_filter <- function(id = NULL,
                  array_field = array_field,
                  array_separator = array_separator,
                  search_method = search_method,
-                 numeric_breaks = numeric_breaks,
+                 
                  options = options,
                  ui_section = ui_section)
   
@@ -118,7 +115,7 @@ DataFilterSet <- R6::R6Class(
     ns = NS(NULL),
     all_data_on_null = NULL,
     last_filter = "",
-    initialize = function(..., id, all_data_on_null){
+    initialize = function(..., data, id, all_data_on_null){
       
       self$id <- id
       self$all_data_on_null <- all_data_on_null
@@ -134,6 +131,45 @@ DataFilterSet <- R6::R6Class(
       self$filters <- self$elements[is_filter]
       names(self$filters) <- sapply(self$filters, "[[", "column_name")
       
+      # Set data summaries.
+      # Do NOT store entire passed dataset, only what is necessary: unique() for categories,
+      # range() for numerics.
+      for(i in seq_along(self$filters)){
+        
+        # R6 class constructed with data_filter()
+        obj <- self$filters[[i]]
+        
+        column_data <- data[[obj$column_name]]
+        
+        
+        # Text-based categorical filter
+        if(obj$filter_ui %in% c("picker","select","checkboxes")){
+          
+          if(is.factor(column_data)){
+            column_data <- as.character(column_data)
+          }
+          
+          .unique <- make_choices(column_data, obj$n_label, obj$sort, obj$array_field, obj$array_separator)
+          .range <- NULL
+          
+        } else if(obj$filter_ui %in% c("slider",
+                                   "numeric_min",
+                                   "numeric_max",
+                                   "numeric_range")){
+          .unique <- NULL
+          .range <- range(column_data, na.rm = TRUE) 
+          
+        } else if(obj$filter_ui == "binary"){
+          
+          .unique <- c(TRUE,FALSE)
+          .range <- NULL
+          
+        } 
+        
+        self$filters[[i]]$set("range", .range)
+        self$filters[[i]]$set("unique", .unique)
+        
+      }
       
     },
     ui = function(ns = NS(NULL), section = NULL){
@@ -222,14 +258,12 @@ DataFilterSet <- R6::R6Class(
                                value = input[[filt$id]],
                                object = filt)  
         }
-        
       }
       
       # If set, if all filters are NULL or empty, return no data at all.
       if(!self$all_data_on_null){
         if(all(empt))data <- data[0,]  
       }
-      
       
     return(data)
     },
@@ -252,7 +286,7 @@ DataFilterSet <- R6::R6Class(
       for(i in seq_along(vals)){
         filt <- self$filters[[names(vals)[i]]]
         if(!is.null(filt)){
-          filt$set(session, id = filt$id, vals[[i]])  
+          filt$set_value(session, id = filt$id, vals[[i]])  
         }
         
       }
@@ -309,12 +343,12 @@ DataFilter <- R6Class(
     sort = NULL,
     array_field = NULL,
     array_separator = NULL,
-    numeric_breaks = NULL,
+    
     
     # DataFilter$new()
     initialize = function(id, 
                           ui_section = NULL,
-                          column_data = NULL, 
+                          #column_data = NULL, 
                           column_name, 
                           filter_ui,
                           updates = NULL,
@@ -324,7 +358,6 @@ DataFilter <- R6Class(
                           array_field = FALSE,
                           array_separator = ";",
                           search_method = NULL,
-                          numeric_breaks = NULL,
                           options = list()){
       
       self$id <- id
@@ -339,8 +372,6 @@ DataFilter <- R6Class(
       self$array_field <- array_field
       self$array_separator <- array_separator
       
-      self$numeric_breaks <- numeric_breaks
-      
       if(!("label" %in% names(options))){
         self$label <- self$column_name
       } else {
@@ -350,26 +381,26 @@ DataFilter <- R6Class(
       self$options <- options
       self$filter_ui <- filter_ui
       
-      # Text-based categorical filter
-      if(filter_ui %in% c("picker","select","checkboxes")){
-        
-        if(is.factor(column_data)){
-          column_data <- as.character(column_data)
-        }
- 
-        self$unique <- make_choices(column_data, n_label, sort, array_field, array_separator)
-        
-        self$range <- NULL
-      } else if(filter_ui %in% c("slider",
-                                 "numeric_min",
-                                 "numeric_max",
-                                 "numeric_range")){
-        self$unique <- NULL
-        self$range <- range(column_data, na.rm = TRUE) 
-      } else if(filter_ui == "binary"){
-        self$unique <- c(TRUE,FALSE)
-        self$range <- NULL
-      }
+      # # Text-based categorical filter
+      # if(filter_ui %in% c("picker","select","checkboxes")){
+      #   
+      #   if(is.factor(column_data)){
+      #     column_data <- as.character(column_data)
+      #   }
+      # 
+      #   self$unique <- make_choices(column_data, n_label, sort, array_field, array_separator)
+      #   
+      #   self$range <- NULL
+      # } else if(filter_ui %in% c("slider",
+      #                            "numeric_min",
+      #                            "numeric_max",
+      #                            "numeric_range")){
+      #   self$unique <- NULL
+      #   self$range <- range(column_data, na.rm = TRUE) 
+      # } else if(filter_ui == "binary"){
+      #   self$unique <- c(TRUE,FALSE)
+      #   self$range <- NULL
+      # }
       
       # Register the actual function used to make the input field
       # not used
@@ -413,6 +444,12 @@ DataFilter <- R6Class(
     },
     
     #----- Methods
+    
+    # Sets values in self
+    set = function(what, value){
+      self[[what]] <- value
+    },
+    
     update = function(session, id, data, input, last_filter = ""){
       
       if(self$updates){ #&& !last_filter == self$column_name){
@@ -434,7 +471,7 @@ DataFilter <- R6Class(
       
     },
     
-    set = function(session, id, val){
+    set_value = function(session, id, val){
       
       do.call(self$set_function,
               list(session = session, id = id, self = self, value = val)
@@ -455,14 +492,15 @@ DataFilter <- R6Class(
       id <- ns(self$id)
       out <- switch(self$filter_ui, 
                     
-                    slider = slider_input(id, self),
-                    select = select_input(id, self),
-                    checkboxes = checkboxes_input(id, self),
-                    picker = select_input(id, self, type = "picker"),
-                    numeric_min = numeric_input(id, self, "min"),
-                    numeric_max = numeric_input(id, self, "max"),
-                    numeric_range = numericrange_input(id, self),
-                    switch = binary_input(id, self, type = "switch")
+              slider = slider_input(id, self),
+              select = select_input(id, self),
+              checkboxes = checkboxes_input(id, self),
+              picker = select_input(id, self, type = "picker"),
+              numeric_min = numeric_input(id, self, "min"),
+              numeric_max = numeric_input(id, self, "max"),
+              numeric_range = numericrange_input(id, self),
+              switch = binary_input(id, self, type = "switch")
+                    
       )
       
       self$value_initial <- out$value

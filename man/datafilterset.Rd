@@ -5,24 +5,22 @@
 \alias{data_filter}
 \title{Define a filter set}
 \usage{
-shinyfilterset(..., id = NULL, all_data_on_null = TRUE)
+shinyfilterset(..., data = NULL, id = NULL, all_data_on_null = TRUE)
 
 data_filter(
-  id = NULL,
-  column_data,
   column_name,
   filter_ui = c("picker", "select", "checkboxes", "slider", "numeric_range",
     "numeric_min", "numeric_max", "switch"),
-  updates = FALSE,
+  updates = TRUE,
   sort = TRUE,
   all_choice = NULL,
   n_label = TRUE,
   search_method = c("equal", "regex"),
   array_field = FALSE,
   array_separator = ";",
-  numeric_breaks = NULL,
   options = list(),
-  ui_section = 1
+  ui_section = 1,
+  id = NULL
 )
 }
 \arguments{

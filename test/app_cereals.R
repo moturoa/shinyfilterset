@@ -5,31 +5,15 @@ library(shinyfilterset)
 library(lgrdata)
 data(cereals)
 
-
-source("../R/utils.R")
 cereals$rating_search <- numeric_breaks_labels(cereals$rating, c(20, 40, 60, 80))
 
-# Filters: start with nothing, build up
-updates <- TRUE
 
-picker <- function(column, data = cereals){
-  data_filter(column_data = data[[column]],
-              column_name = column,
-              filter_ui = "checkboxes",
-              updates = TRUE,
-              n_label = TRUE,
-              options = list(selected = NULL)
-  )
-}
-
-cereal_filters <- shinyfilterset(
+cereal_filters <- shinyfilterset(  #data = cereals,
   
-  picker("Manufacturer"),
-  picker("calories"),
-  #picker("sodium"),
-  picker("protein"),
-  #picker("sugars"),
-  picker("rating_search")
+  data_filter("Manufacturer", "picker"),
+  data_filter("calories", "picker"),
+  data_filter("protein", "picker"),
+  data_filter("rating_search", "picker")
   
 )
 
@@ -53,7 +37,6 @@ server <- function(input, output, session) {
   
   
   data_filtered <- reactive({
-    print("applying filters")
     cereal_filters$apply(cereals)
   })
   
@@ -64,7 +47,6 @@ server <- function(input, output, session) {
   
   output$cereal_filters <- renderUI({
     input$btn_reset_filters
-    print("filter UI")
     cereal_filters$ui()
   })
   

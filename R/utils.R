@@ -51,19 +51,6 @@ numeric_breaks_categories <- function(x, breaks, round_digits = 1){
 }
 
 
-numeric_breaks_labels <- function(x, breaks, round_digits = 1){
-  
-  x <- x[!is.na(x)]
-  
-  brks <- c(floor_digits(min(x),round_digits), 
-            breaks, 
-            ceiling_digits(max(x), round_digits))
-  
-  labels <- paste(brks[1:(length(brks)-1)],
-                  brks[2:length(brks)], 
-                  sep = " - ")
-labels[findInterval(x, brks)]
-}
 
 
 make_choices <- function(x, n_label = TRUE, sort = TRUE, 

@@ -20,6 +20,7 @@ data_filter(
   search_method = c("equal", "regex"),
   array_field = FALSE,
   array_separator = ";",
+  numeric_breaks = NULL,
   options = list(),
   ui_section = 1
 )

@@ -85,17 +85,20 @@ checkboxes_input <- function(id, self){
   
   options <- self$options
   
-  if(!("selected" %in% names(options))){
-    options$selected <- self$unique
+  if(self$filter_ui == "checkboxes"){
+    if(!("selected" %in% names(options))){
+      options$selected <- NULL #self$unique
+    }
+    if(!("choices" %in% names(options))){
+      options$choices <- self$unique
+    }  
   }
-  if(!("choices" %in% names(options))){
-    options$choices <- self$unique
-  }
+  
+  
   
   options$label <- self$label
   
-  options <- c(list(inputId = id), 
-               options)
+  options <- c(list(inputId = id), options)
   
   list(ui = do.call(shiny::checkboxGroupInput, options),
        value = options$selected)

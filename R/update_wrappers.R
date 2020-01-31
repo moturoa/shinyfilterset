@@ -35,6 +35,12 @@ update_checkboxes <- function(session, id, self, data, input){
   vals <- make_choices(data, self$n_label, self$sort, self$array_field, self$array_separator,
                        selected = input[[id]])
   
+  if(is.null(input[[id]])){
+    sel <- NULL
+  } else {
+    sel <- input[[id]]
+  }
+  
   shiny::updateCheckboxGroupInput(session, id, choices = vals, selected = input[[id]])
   
 }

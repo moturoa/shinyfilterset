@@ -61,11 +61,11 @@ data_filter <- function(id = NULL,
                                       "select",
                                       "checkboxes",
                                       
-                                      "slider",    # range
+                                      "slider",    # numeric range
                                       "numeric_range",
                                       
-                                      "numeric_min",  # minimum
-                                      "numeric_max",  # maximum
+                                      "numeric_min",  # numeric minimum
+                                      "numeric_max",  # ... maximum
                                       
                                       "switch"), 
                         updates = FALSE,   # for slider update min/max for bug avoidance??
@@ -76,6 +76,7 @@ data_filter <- function(id = NULL,
                         search_method = c("equal","regex"),  # category only
                         array_field = FALSE,  # category only
                         array_separator = ";",  # category only
+                        numeric_breaks = NULL,
                         
                         options = list(),
                         ui_section = 1){
@@ -98,6 +99,7 @@ data_filter <- function(id = NULL,
                  array_field = array_field,
                  array_separator = array_separator,
                  search_method = search_method,
+                 numeric_breaks = numeric_breaks,
                  options = options,
                  ui_section = ui_section)
   
@@ -307,6 +309,7 @@ DataFilter <- R6Class(
     sort = NULL,
     array_field = NULL,
     array_separator = NULL,
+    numeric_breaks = NULL,
     
     # DataFilter$new()
     initialize = function(id, 
@@ -321,6 +324,7 @@ DataFilter <- R6Class(
                           array_field = FALSE,
                           array_separator = ";",
                           search_method = NULL,
+                          numeric_breaks = NULL,
                           options = list()){
       
       self$id <- id
@@ -334,6 +338,8 @@ DataFilter <- R6Class(
       self$sort <- sort
       self$array_field <- array_field
       self$array_separator <- array_separator
+      
+      self$numeric_breaks <- numeric_breaks
       
       if(!("label" %in% names(options))){
         self$label <- self$column_name
@@ -354,7 +360,10 @@ DataFilter <- R6Class(
         self$unique <- make_choices(column_data, n_label, sort, array_field, array_separator)
         
         self$range <- NULL
-      } else if(filter_ui %in% c("slider","numeric_min","numeric_max","numeric_range")){
+      } else if(filter_ui %in% c("slider",
+                                 "numeric_min",
+                                 "numeric_max",
+                                 "numeric_range")){
         self$unique <- NULL
         self$range <- range(column_data, na.rm = TRUE) 
       } else if(filter_ui == "binary"){
@@ -406,8 +415,7 @@ DataFilter <- R6Class(
     #----- Methods
     update = function(session, id, data, input, last_filter = ""){
       
-      
-      if(self$updates && !last_filter == self$column_name){
+      if(self$updates){ #&& !last_filter == self$column_name){
         
         column_data <- data[[self$column_name]]
         

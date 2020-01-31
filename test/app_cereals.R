@@ -5,13 +5,17 @@ library(shinyfilterset)
 library(lgrdata)
 data(cereals)
 
+
+source("../R/utils.R")
+cereals$rating_search <- numeric_breaks_labels(cereals$rating, c(20, 40, 60, 80))
+
 # Filters: start with nothing, build up
 updates <- TRUE
 
 picker <- function(column, data = cereals){
   data_filter(column_data = data[[column]],
               column_name = column,
-              filter_ui = "picker",
+              filter_ui = "checkboxes",
               updates = TRUE,
               n_label = TRUE,
               options = list(selected = NULL)
@@ -19,13 +23,14 @@ picker <- function(column, data = cereals){
 }
 
 cereal_filters <- shinyfilterset(
-  all_data_on_null = TRUE, # default TRUE
   
   picker("Manufacturer"),
   picker("calories"),
-  picker("sodium"),
+  #picker("sodium"),
   picker("protein"),
-  picker("sugars")
+  #picker("sugars"),
+  picker("rating_search")
+  
 )
 
 

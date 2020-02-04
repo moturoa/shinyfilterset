@@ -16,7 +16,11 @@
 #' @importFrom dplyr filter
 #' @importFrom rlang sym
 #' @importFrom uuid UUIDgenerate
-shinyfilterset <- function(..., data = NULL, id = NULL, all_data_on_null = TRUE){
+shinyfilterset <- function(..., 
+                           data = NULL, 
+                           .list = NULL,
+                           all_data_on_null = TRUE,
+                           id = NULL){
   
   if(is.null(id)){
     id <- uuid::UUIDgenerate()
@@ -25,6 +29,10 @@ shinyfilterset <- function(..., data = NULL, id = NULL, all_data_on_null = TRUE)
   DataFilterSet$new(..., data = data, id = id, all_data_on_null = all_data_on_null) 
   
 }
+
+
+#y <- x$cereal_filters
+#out <- do.call(shinyfilterset, lapply(names(y), function(nm)data_filter(nm, y[[nm]])))
 
 #' @export
 filter_section <- function(section_nr = 1, ...){
@@ -66,6 +74,7 @@ data_filter <- function(column_name,
                                       "numeric_max",  # ... maximum
                                       
                                       "switch"), 
+                        label = column_name,
                         updates = TRUE,
                         sort = TRUE,   # category only
                         all_choice = NULL,  # category only
@@ -73,6 +82,7 @@ data_filter <- function(column_name,
                         search_method = c("equal","regex"),  # category only
                         array_field = FALSE,  # category only
                         array_separator = ";",  # category only
+                        round_digits = 1,
                         
                         # sent to input method
                         options = list(),
@@ -96,7 +106,8 @@ data_filter <- function(column_name,
                  array_field = array_field,
                  array_separator = array_separator,
                  search_method = search_method,
-                 
+                 round_digits = round_digits,
+                 label = label,
                  options = options,
                  ui_section = ui_section)
   
@@ -132,7 +143,8 @@ DataFilterSet <- R6::R6Class(
       names(self$filters) <- sapply(self$filters, "[[", "column_name")
       
       # Set data summaries.
-      # Do NOT store entire passed dataset, only what is necessary: unique() for categories,
+      # Do NOT store entire passed dataset, only what is necessary: 
+      # unique() for character/factor,
       # range() for numerics.
       for(i in seq_along(self$filters)){
         
@@ -335,7 +347,7 @@ DataFilter <- R6Class(
     range = NULL,
     filter_ui = NULL,
     options = NULL,
-    input_function = NULL,
+    #input_function = NULL,
     update_function = NULL,
     set_function = NULL,
     value_initial = NULL,
@@ -343,7 +355,7 @@ DataFilter <- R6Class(
     sort = NULL,
     array_field = NULL,
     array_separator = NULL,
-    
+    round_digits = NULL,
     
     # DataFilter$new()
     initialize = function(id, 
@@ -358,6 +370,8 @@ DataFilter <- R6Class(
                           array_field = FALSE,
                           array_separator = ";",
                           search_method = NULL,
+                          round_digits = NULL,
+                          label = NULL,
                           options = list()){
       
       self$id <- id
@@ -372,48 +386,26 @@ DataFilter <- R6Class(
       self$array_field <- array_field
       self$array_separator <- array_separator
       
-      if(!("label" %in% names(options))){
-        self$label <- self$column_name
-      } else {
-        self$label <- options$label
-      }
+      self$round_digits <- round_digits
+      
+      self$label <- label
       
       self$options <- options
       self$filter_ui <- filter_ui
+
       
-      # # Text-based categorical filter
-      # if(filter_ui %in% c("picker","select","checkboxes")){
-      #   
-      #   if(is.factor(column_data)){
-      #     column_data <- as.character(column_data)
-      #   }
-      # 
-      #   self$unique <- make_choices(column_data, n_label, sort, array_field, array_separator)
-      #   
-      #   self$range <- NULL
-      # } else if(filter_ui %in% c("slider",
-      #                            "numeric_min",
-      #                            "numeric_max",
-      #                            "numeric_range")){
-      #   self$unique <- NULL
-      #   self$range <- range(column_data, na.rm = TRUE) 
-      # } else if(filter_ui == "binary"){
-      #   self$unique <- c(TRUE,FALSE)
-      #   self$range <- NULL
-      # }
-      
-      # Register the actual function used to make the input field
-      # not used
-      self$input_function <- switch(self$filter_ui, 
-                                    slider = "shiny::sliderInput",
-                                    select = "shiny::selectInput",
-                                    checkboxes = "shiny::checkboxGroupInput",
-                                    picker = "shinyWidgets::pickerInput",
-                                    numeric_min = "shiny::numericInput",
-                                    numeric_max = "shiny::numericInput",
-                                    numeric_range = "shinyWidgets::numericRangeInput",
-                                    switch = "shinyWidgets::materialSwitch"
-      )
+      # # Register the actual function used to make the input field
+      # # not used
+      # self$input_function <- switch(self$filter_ui, 
+      #                               slider = "shiny::sliderInput",
+      #                               select = "shiny::selectInput",
+      #                               checkboxes = "shiny::checkboxGroupInput",
+      #                               picker = "shinyWidgets::pickerInput",
+      #                               numeric_min = "shiny::numericInput",
+      #                               numeric_max = "shiny::numericInput",
+      #                               numeric_range = "shinyWidgets::numericRangeInput",
+      #                               switch = "shinyWidgets::materialSwitch"
+      # )
       
       # register the function that can be used to update the input field,
       # choices, min/max, etc.

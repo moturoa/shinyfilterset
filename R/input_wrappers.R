@@ -13,7 +13,8 @@ slider_input <- function(id, self){
   
   options <- c(list(inputId = id), 
                options, 
-               list(min = self$range[1], max = self$range[2]))
+               list(min = floor_digits(self$range[1], self$round_digits), 
+                    max = ceiling_digits(self$range[2], self$round_digits)))
   
   list(ui = do.call(shiny::sliderInput, options),
        value = options$value)

@@ -9,6 +9,9 @@ shinyfilterset(
   ...,
   data = NULL,
   .list = NULL,
+  updates = NULL,
+  updates_on_last_use = NULL,
+  n_label = NULL,
   all_data_on_null = TRUE,
   id = NULL
 )

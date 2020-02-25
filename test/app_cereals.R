@@ -12,6 +12,9 @@ cereals$rating_search <- numeric_breaks_labels(cereals$rating, c(20, 40, 60, 80)
 
 
 cereal_filters <- shinyfilterset( 
+  data = cereals,
+  updates = TRUE,
+  n_label = FALSE,
   
   data_filter("Manufacturer", "picker"),
   data_filter("calories", "picker"),

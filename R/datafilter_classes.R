@@ -19,6 +19,10 @@
 shinyfilterset <- function(..., 
                            data = NULL, 
                            .list = NULL,
+                           updates = NULL,
+                           updates_on_last_use = NULL,
+                           n_label = NULL,
+                           
                            all_data_on_null = TRUE,
                            id = NULL){
   
@@ -26,7 +30,11 @@ shinyfilterset <- function(...,
     id <- uuid::UUIDgenerate()
   }
   
-  DataFilterSet$new(..., data = data, id = id, all_data_on_null = all_data_on_null) 
+  DataFilterSet$new(..., data = data, id = id, 
+                    updates = updates, 
+                    updates_on_last_use = updates_on_last_use,
+                    n_label = n_label,
+                    all_data_on_null = all_data_on_null) 
   
 }
 
@@ -125,14 +133,20 @@ DataFilterSet <- R6::R6Class(
     id = NULL,
     elements = NULL,
     filters = NULL,
+    updates = NULL,
+    updates_on_last_use = NULL,
+    n_label = NULL,
     history = c(),
     ns = NS(NULL),
     all_data_on_null = NULL,
     last_filter = "",
-    initialize = function(..., data, id, all_data_on_null){
+    initialize = function(..., data, id, updates, all_data_on_null, updates_on_last_use, n_label){
       
       self$id <- id
       self$all_data_on_null <- all_data_on_null
+      self$updates <- updates
+      self$updates_on_last_use <- updates_on_last_use
+      self$n_label <- n_label
       
       args <- list(...)
       if(inherits(args[[1]], "filter_section")){
@@ -184,6 +198,17 @@ DataFilterSet <- R6::R6Class(
         self$filters[[i]]$set("range", .range)
         self$filters[[i]]$set("unique", .unique)
         
+        
+        # Apply extra arguments
+        if(!is.null(self$updates)){
+          self$filters[[i]]$set("updates", updates)
+        }
+        if(!is.null(self$updates_on_last_use)){
+          self$filters[[i]]$set("updates_on_last_use", updates_on_last_use)
+        }
+        if(!is.null(self$n_label)){
+          self$filters[[i]]$set("n_label", n_label)
+        }
       }
       
     },
@@ -192,7 +217,6 @@ DataFilterSet <- R6::R6Class(
       ns <- NS(ns(self$id))
       
       self$history <- c()
-      #self$monitor()
       
       tags$div(id = ns(self$id),
                lapply(self$elements, function(x){
@@ -228,7 +252,7 @@ DataFilterSet <- R6::R6Class(
     update = function(data){
       
       last_fil <- self$history[length(self$history)]
-      print(self$history)
+      
       callModule(private$update_server, 
                  id = self$id,
                  data = data,
@@ -254,7 +278,7 @@ DataFilterSet <- R6::R6Class(
     
     
     monitor = function(){
-      print("monitor")
+      
       callModule(private$monitor_server, self$id)
       
     },
@@ -390,6 +414,7 @@ DataFilter <- R6Class(
     array_field = NULL,
     array_separator = NULL,
     round_digits = NULL,
+    n_updates = 0,
     
     # DataFilter$new()
     initialize = function(id, 
@@ -429,7 +454,6 @@ DataFilter <- R6Class(
       self$options <- options
       self$filter_ui <- filter_ui
 
-      
       # # Register the actual function used to make the input field
       # # not used
       # self$input_function <- switch(self$filter_ui, 
@@ -483,7 +507,7 @@ DataFilter <- R6Class(
       is_last <- isTRUE(!is.null(last_filter) && last_filter == self$column_name)
       #if(length(last_filter))browser()
       
-      if(self$updates & !(is_last & !self$updates_on_last_use)){
+      if(self$n_updates == 0 | (self$updates & !(is_last & !self$updates_on_last_use))){
         
         column_data <- data[[self$column_name]]
         
@@ -497,6 +521,7 @@ DataFilter <- R6Class(
           do.call(self$update_function,
                   list(session = session, id = id, self = self, data = column_data, input = input)
           )
+          self$n_updates <- self$n_updates + 1
         }
       }
       
@@ -535,6 +560,7 @@ DataFilter <- R6Class(
       )
       
       self$value_initial <- out$value
+      self$n_updates <- 0
       
       return(out$ui)
     }

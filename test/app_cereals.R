@@ -11,7 +11,7 @@ cereals$rating_search <- numeric_breaks_labels(cereals$rating, c(20, 40, 60, 80)
 
 
 
-cereal_filters <- shinyfilterset(  #data = cereals,
+cereal_filters <- shinyfilterset( 
   
   data_filter("Manufacturer", "picker"),
   data_filter("calories", "picker"),
@@ -19,10 +19,6 @@ cereal_filters <- shinyfilterset(  #data = cereals,
   data_filter("rating_search", "picker")
   
 )
-
-
-#opt <- yaml::read_yaml("test/filters.yaml")
-
 
 
 ui <- fluidPage(

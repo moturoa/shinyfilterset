@@ -76,6 +76,7 @@ data_filter <- function(column_name,
                                       "switch"), 
                         label = column_name,
                         updates = TRUE,
+                        updates_on_last_use = FALSE,
                         sort = TRUE,   # category only
                         all_choice = NULL,  # category only
                         n_label = TRUE,  # category only
@@ -101,6 +102,7 @@ data_filter <- function(column_name,
                  column_name = column_name, 
                  filter_ui = filter_ui,
                  updates = updates,
+                 updates_on_last_use = updates_on_last_use,
                  n_label = n_label,
                  all_choice = all_choice,
                  array_field = array_field,
@@ -214,17 +216,20 @@ DataFilterSet <- R6::R6Class(
                  id = self$id,
                  data = data)
       
+      
       self$update(out)
       
     return(out)
     },
     
-    update = function(data, last_filter = ""){
+    update = function(data, last_filter = list()){
       
+      last_fil <- self$used_filters()
+      #print(last_fil)
       callModule(private$update_server, 
                  id = self$id,
                  data = data,
-                 last_filter = last_filter
+                 last_filter = last_fil
                  )
     },
 
@@ -283,12 +288,21 @@ DataFilterSet <- R6::R6Class(
     
     update_server = function(input, output, session, data, last_filter){
       
-      lapply(self$filters, function(x){
-        x$update(session, 
-                 id = x$id, 
-                 data = data, 
-                 input = input, 
-                 last_filter = last_filter)
+      # if(length(last_filter)){
+      #   filters_update <- self$filters[-match(names(last_filter[1]), names(self$filters))]  
+      # } else {
+      #   filters_update <- self$filters
+      # }
+      # 
+      
+      lapply( self$filters, function(x){
+      
+          x$update(session, 
+                   id = x$id, 
+                   data = data, 
+                   input = input,
+                   last_filter = names(last_filter[1]))
+      
       })
       
     },
@@ -305,6 +319,7 @@ DataFilterSet <- R6::R6Class(
       
     },
     
+    # notused
     reactive_server = function(input, output, session){
       
       lapply(self$filters, function(x){
@@ -340,6 +355,7 @@ DataFilter <- R6Class(
     ui_section = NULL,
     column_name = NULL,
     updates = NULL,
+    updates_on_last_use = NULL,
     all_choice = NULL,
     search_method = NULL,
     label = NULL,
@@ -364,6 +380,7 @@ DataFilter <- R6Class(
                           column_name, 
                           filter_ui,
                           updates = NULL,
+                          updates_on_last_use = NULL,
                           sort = TRUE,
                           n_label = TRUE,
                           all_choice = NULL,
@@ -380,6 +397,7 @@ DataFilter <- R6Class(
       self$all_choice <- all_choice
       self$search_method <- search_method
       self$updates <- updates
+      self$updates_on_last_use <- updates_on_last_use
       
       self$n_label <- n_label
       self$sort <- sort
@@ -444,7 +462,10 @@ DataFilter <- R6Class(
     
     update = function(session, id, data, input, last_filter = ""){
       
-      if(self$updates){ #&& !last_filter == self$column_name){
+      is_last <- isTRUE(!is.null(last_filter) && last_filter == self$column_name)
+      #if(length(last_filter))browser()
+      
+      if(self$updates & !(is_last & !self$updates_on_last_use)){
         
         column_data <- data[[self$column_name]]
         

@@ -19,6 +19,7 @@ data_filter(
     "numeric_min", "numeric_max", "switch"),
   label = column_name,
   updates = TRUE,
+  updates_on_last_use = FALSE,
   sort = TRUE,
   all_choice = NULL,
   n_label = TRUE,

@@ -28,7 +28,10 @@ ui <- fluidPage(
            actionButton("btn_reset_filters","Reset", class="btn-primary"),
            tags$hr(),
            actionButton("btn_save_filter", "Save"),
-           actionButton("btn_load_filter", "Load")
+           actionButton("btn_load_filter", "Load"),
+           tags$hr(),
+           actionButton("browse","browser()")
+           
            ),
     column(6,
            uiOutput("cereal_rows"),
@@ -41,12 +44,15 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
   
+  observeEvent(input$browse,browser())
+  cereal_filters$monitor()
   
   data_filtered <- reactive({
     print("apply")
     cereal_filters$apply(cereals)
   })
   
+
   output$cereal_rows <- renderUI({
     tags$h2(paste("Aantal rijen: ", nrow(data_filtered())))
   })
@@ -67,7 +73,7 @@ server <- function(input, output, session) {
   
   observeEvent(input$btn_load_filter, {
     fils <- readRDS("lastfilters.rds")
-    print("load")
+    #print("load")
     cereal_filters$load(fils)
   })
   

@@ -125,6 +125,7 @@ DataFilterSet <- R6::R6Class(
     id = NULL,
     elements = NULL,
     filters = NULL,
+    history = c(),
     ns = NS(NULL),
     all_data_on_null = NULL,
     last_filter = "",
@@ -190,6 +191,9 @@ DataFilterSet <- R6::R6Class(
       
       ns <- NS(ns(self$id))
       
+      self$history <- c()
+      #self$monitor()
+      
       tags$div(id = ns(self$id),
                lapply(self$elements, function(x){
                  
@@ -215,17 +219,16 @@ DataFilterSet <- R6::R6Class(
       out <- callModule(private$filter_server, 
                  id = self$id,
                  data = data)
-      
-      
+
       self$update(out)
       
     return(out)
     },
     
-    update = function(data, last_filter = list()){
+    update = function(data){
       
-      last_fil <- self$used_filters()
-      #print(last_fil)
+      last_fil <- self$history[length(self$history)]
+      print(self$history)
       callModule(private$update_server, 
                  id = self$id,
                  data = data,
@@ -248,6 +251,14 @@ DataFilterSet <- R6::R6Class(
       callModule(private$used_filters_server, self$id)
       
     },
+    
+    
+    monitor = function(){
+      print("monitor")
+      callModule(private$monitor_server, self$id)
+      
+    },
+    
     
     reactive = function(){
       
@@ -288,20 +299,13 @@ DataFilterSet <- R6::R6Class(
     
     update_server = function(input, output, session, data, last_filter){
       
-      # if(length(last_filter)){
-      #   filters_update <- self$filters[-match(names(last_filter[1]), names(self$filters))]  
-      # } else {
-      #   filters_update <- self$filters
-      # }
-      # 
-      
       lapply( self$filters, function(x){
       
           x$update(session, 
                    id = x$id, 
                    data = data, 
                    input = input,
-                   last_filter = names(last_filter[1]))
+                   last_filter = last_filter)
       
       })
       
@@ -316,6 +320,20 @@ DataFilterSet <- R6::R6Class(
         }
         
       }
+      
+    },
+    
+    monitor_server = function(input, output, session){
+      
+      lapply(self$filters, function(x){
+        
+        observeEvent(input[[x$id]], priority = 100, {
+          
+          self$history <- c(self$history, x$column_name)
+          
+        })
+        
+      })
       
     },
     

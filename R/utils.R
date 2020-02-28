@@ -6,6 +6,13 @@ is.Tag <- function(x){
   inherits(x, "shiny.tag")
 }
 
+random_id <- function(n = 10){
+  
+  v <- c(letters,LETTERS)
+  paste(sample(v, 10, replace = TRUE), collapse="")
+  
+}
+
 
 get_unique <- function(x, sort = TRUE, array_field = FALSE, array_separator = ";"){
   

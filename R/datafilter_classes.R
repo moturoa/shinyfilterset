@@ -27,7 +27,8 @@ shinyfilterset <- function(...,
                            id = NULL){
   
   if(is.null(id)){
-    id <- uuid::UUIDgenerate()
+    #id <- uuid::UUIDgenerate()
+    id <- random_id()
   }
   
   DataFilterSet$new(..., data = data, id = id, 
@@ -102,7 +103,8 @@ data_filter <- function(column_name,
   search_method <- match.arg(search_method)
   
   if(is.null(id)){
-    id <- uuid::UUIDgenerate()
+    #id <- uuid::UUIDgenerate()
+    id <- random_id()
   }
 
    

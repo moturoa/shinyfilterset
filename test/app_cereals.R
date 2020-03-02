@@ -25,10 +25,10 @@ cereal_filters <- shinyfilterset(
   updates = TRUE,
   n_label = FALSE,
   
-  data_filter("Manufacturer", "picker"),
-  data_filter("calories", "picker"),
-  data_filter("protein", "picker"),
-  data_filter("rating_search", "picker")
+  data_filter("Manufacturer", "select"),
+  data_filter("calories", "select"),
+  data_filter("protein", "select"),
+  data_filter("rating_search", "select")
   
 )
 
@@ -43,7 +43,7 @@ ui <- fluidPage(
            actionButton("btn_load_filter", "Load"),
            tags$hr(),
            actionButton("browse","browser()"),
-           actionButton("reset_calories", "Reset calories")
+           actionButton("btn_set","set manufacturer N")
            
            ),
     column(6,
@@ -60,16 +60,44 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
   
-  observeEvent(input$browse,browser())
+  observeEvent(input$browse, browser())
   cereal_filters$monitor()
+  
+  observeEvent(input$btn_set, {
+    cereal_filters$filters[["Manufacturer"]]$reset()
+  })
   
   data_filtered <- reactive({
     
-    print("apply")
+    print(paste("apply", sample(1:1000,1)))
     cereal_filters$apply(cereals)
     
   })
   
+  
+  
+  output$cereal_filters <- renderUI({
+    
+    cereal_filters$ui()
+    
+  })
+  
+  observeEvent(input$btn_reset_filters,  {
+    
+    cereal_filters$reset_all()
+    
+  })
+  
+  
+  # output$cereal_filters <- renderUI({
+  #   
+  #   input$btn_reset_filters
+  #   uf <- isolate(names(cereal_filters$used_filters()))
+  #   if(input$btn_reset_filters > 0 && length(uf)){
+  #     cereal_filters$ui()
+  #   }
+  #   
+  # })
 
   # Lijst van gebruikte filters
   output$ui_used_filters <- renderUI({
@@ -85,23 +113,13 @@ server <- function(input, output, session) {
     }
     
   })
-  
-  observeEvent(input$reset_calories, {
-    
-    cereal_filters$reset("calories")
-    
-    
-  })
+
   
   output$cereal_rows <- renderUI({
     tags$h2(paste("Aantal rijen: ", nrow(data_filtered())))
   })
   
-  output$cereal_filters <- renderUI({
-    input$btn_reset_filters
-    print("ui")
-    cereal_filters$ui()
-  })
+
   
   output$cereal_filtered <- renderTable({
     data_filtered()[,c("Manufacturer","calories","sodium","protein","sugars")]

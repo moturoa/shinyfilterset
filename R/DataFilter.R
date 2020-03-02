@@ -102,10 +102,9 @@ DataFilter <- R6Class(
     update = function(session, id, data, input, last_filter = ""){
       
       is_last <- isTRUE(!is.null(last_filter) && last_filter == self$column_name)
-      #if(length(last_filter))browser()
       
       if(self$n_updates == 0 | (self$updates & !(is_last & !self$updates_on_last_use))){
-        
+      
         column_data <- data[[self$column_name]]
         
         # hier niet nodig? zie update functions
@@ -132,12 +131,6 @@ DataFilter <- R6Class(
       
     },
     
-    reset = function(outer_id){
-      
-      callModule(private$reset_server, self$id, outer_id = outer_id)
-      
-    },
-    
     ui = function(ns = NS(NULL)){
       
       id <- ns(self$id)
@@ -159,20 +152,6 @@ DataFilter <- R6Class(
       
       return(out$ui)
     }
-  ),
-  
-  private = list(
-  
-    reset_server = function(input, output, session, outer_id){
-      
-      ns <- NS(outer_id)
-      
-      do.call(self$set_function,
-              list(session = session, id = ns(self$id), self = self, value = self$value_initial)
-      )  
-    }  
-    
-    
   )
   
 )

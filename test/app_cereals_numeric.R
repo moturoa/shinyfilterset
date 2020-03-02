@@ -46,8 +46,11 @@ server <- function(input, output, session) {
   })
   
   output$cereal_filters <- renderUI({
-    input$btn_reset_filters
     cereal_filters$ui()
+  })
+  
+  observeEvent(input$btn_reset_filters, {
+    cereal_filters$reset_all()
   })
   
   output$cereal_filtered <- renderTable({

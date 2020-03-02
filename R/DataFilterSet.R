@@ -167,9 +167,15 @@ DataFilterSet <- R6::R6Class(
       
     },
     
-    reset = function(name = NULL){
+    # reset = function(name = NULL){
+    #   
+    #   self$filters[[name]]$reset(outer_id = self$id)
+    #   
+    # },
+    
+    reset_all = function(){
       
-      self$filters[[name]]$reset(outer_id = self$id)
+      callModule(private$reset_server, self$id)
       
     },
     
@@ -233,12 +239,26 @@ DataFilterSet <- R6::R6Class(
     load_server = function(input, output, session, vals){
       
       for(i in seq_along(vals)){
-        filt <- self$filters[[names(vals)[i]]]
+        filt <- self$filters[[i]]
         if(!is.null(filt)){
           filt$set_value(session, id = filt$id, vals[[i]])  
         }
         
       }
+      
+    },
+    
+    reset_server = function(input, output, session){
+      
+      for(i in seq_along(self$filters)){
+        
+        filt <- self$filters[[i]]
+        if(!is.null(filt)){
+          filt$set_value(session, id = filt$id, filt$value_initial)  
+        }
+        
+      }
+      
       
     },
     

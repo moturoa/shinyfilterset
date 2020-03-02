@@ -6,17 +6,23 @@ set_slider <- function(session, id, self, value){
 
 set_select <- function(session, id, self, value){
   
+  if(is.null(value))value <- character(0)
+  
   shiny::updateSelectInput(session, id, selected = value)
   
 }
 
 set_checkboxes <- function(session, id, self, value){
   
+  if(is.null(value))value <- character(0)
+  
   shiny::updateCheckboxGroupInput(session, id, selected = value)
   
 }
 
 set_picker <- function(session, id, self, value){
+  
+  if(is.null(value))value <- character(0)
   
   shinyWidgets::updatePickerInput(session, id, selected = value)
   

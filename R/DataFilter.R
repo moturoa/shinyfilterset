@@ -164,8 +164,8 @@ DataFilter <- R6Class(
   private = list(
   
     reset_server = function(input, output, session, outer_id){
+      
       ns <- NS(outer_id)
-      print(ns(self$id))
       
       do.call(self$set_function,
               list(session = session, id = ns(self$id), self = self, value = self$value_initial)

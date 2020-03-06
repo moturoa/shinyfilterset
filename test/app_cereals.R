@@ -82,6 +82,7 @@ server <- function(input, output, session) {
     
   })
   
+  
   observeEvent(input$btn_reset_filters,  {
     
     cereal_filters$reset_all()

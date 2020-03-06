@@ -121,9 +121,14 @@ DataFilterSet <- R6::R6Class(
                         id = self$id,
                         data = data)
       
-      self$update(out)
+      self$update(out$data)
       
-      return(out)
+      # If set, if all filters are NULL or empty, return no data at all.
+      if(!self$all_data_on_null){
+        if(all(out$empty))out$data <- out$data[0,]  
+      }
+      
+      return(out$data)
     },
     
     update = function(data){
@@ -212,13 +217,8 @@ DataFilterSet <- R6::R6Class(
                                object = filt)  
         }
       }
-      
-      # If set, if all filters are NULL or empty, return no data at all.
-      if(!self$all_data_on_null){
-        if(all(empt))data <- data[0,]  
-      }
-      
-      return(data)
+
+      return(list(data = data, empty = empt))
     },
     
     
@@ -253,6 +253,7 @@ DataFilterSet <- R6::R6Class(
       for(i in seq_along(self$filters)){
         
         filt <- self$filters[[i]]
+        
         if(!is.null(filt)){
           filt$set_value(session, id = filt$id, filt$value_initial)  
         }

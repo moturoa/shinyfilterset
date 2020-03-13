@@ -88,7 +88,7 @@ DataFilterSet <- R6::R6Class(
       }
       
     },
-    ui = function(ns = NS(NULL), section = NULL){
+    ui = function(ns = NS(NULL), section = NULL, horizontal = FALSE){
       
       ns <- NS(ns(self$id))
       
@@ -107,7 +107,15 @@ DataFilterSet <- R6::R6Class(
                  }
                  if(is.DataFilter(x) && 
                     (is.null(section) || x$ui_section %in% section)){
-                   return(x$ui(ns))
+                   
+                   ui <- x$ui(ns)
+                   
+                   if(horizontal){
+                     ui <- tags$div(style = "display: inline-block; vertical-align: top;", 
+                              ui)  
+                   }
+                   
+                   return(ui)
                  }
                  
                })

@@ -69,7 +69,7 @@ server <- function(input, output, session) {
   
   data_filtered <- reactive({
     
-    print(paste("apply", sample(1:1000,1)))
+    #print(paste("apply", sample(1:1000,1)))
     cereal_filters$apply(cereals)
     
   })

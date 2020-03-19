@@ -7,7 +7,7 @@ set_slider <- function(session, id, self, value){
 set_select <- function(session, id, self, value){
   
   if(is.null(value))value <- character(0)
-  
+  #print(paste(id, value))
   shiny::updateSelectInput(session, id, selected = value)
   
 }

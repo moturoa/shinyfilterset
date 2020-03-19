@@ -112,7 +112,6 @@ DataFilter <- R6Class(
           column_data <- as.character(column_data)
         }
         
-        #print(self$column_name)
         if(!is.null(column_data)){
           do.call(self$update_function,
                   list(session = session, id = id, self = self, data = column_data, input = input)
@@ -124,7 +123,6 @@ DataFilter <- R6Class(
     },
     
     set_value = function(session, id, val){
-      
       do.call(self$set_function,
               list(session = session, id = id, self = self, value = val)
       )

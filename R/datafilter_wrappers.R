@@ -31,11 +31,14 @@ shinyfilterset <- function(...,
     id <- random_id()
   }
   
-  DataFilterSet$new(..., data = data, id = id, 
+  DataFilterSet$new(..., 
+                    data = data, 
+                    id = id, 
                     updates = updates, 
                     updates_on_last_use = updates_on_last_use,
                     n_label = n_label,
-                    all_data_on_null = all_data_on_null) 
+                    all_data_on_null = all_data_on_null,
+                    .list = .list) 
   
 }
 

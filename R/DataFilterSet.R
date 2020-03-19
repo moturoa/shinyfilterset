@@ -16,7 +16,7 @@ DataFilterSet <- R6::R6Class(
     ns = NS(NULL),
     all_data_on_null = NULL,
     last_filter = "",
-    initialize = function(..., data, id, updates, all_data_on_null, updates_on_last_use, n_label){
+    initialize = function(..., data, id, updates, all_data_on_null, updates_on_last_use, n_label, .list){
       
       self$id <- id
       self$all_data_on_null <- all_data_on_null
@@ -24,7 +24,12 @@ DataFilterSet <- R6::R6Class(
       self$updates_on_last_use <- updates_on_last_use
       self$n_label <- n_label
       
-      args <- list(...)
+      if(!is.null(.list)){
+        args <- .list
+      } else {
+        args <- list(...)  
+      }
+      
       if(inherits(args[[1]], "filter_section")){
         args <- do.call(c, args)
       }
@@ -44,6 +49,7 @@ DataFilterSet <- R6::R6Class(
         # R6 class constructed with data_filter()
         obj <- self$filters[[i]]
         
+        
         column_data <- data[[obj$column_name]]
         
         
@@ -61,6 +67,7 @@ DataFilterSet <- R6::R6Class(
                                        "numeric_min",
                                        "numeric_max",
                                        "numeric_range")){
+          
           .unique <- NULL
           .range <- range(column_data, na.rm = TRUE) 
           

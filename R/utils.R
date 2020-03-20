@@ -68,6 +68,10 @@ make_choices <- function(x, n_label = TRUE, sort = TRUE,
     x <- as.character(x)
   }
   
+  if(all(is.na(x))){
+    return(NA)
+  }
+  
   
   if(!array_field){
     tab <- table(x)  

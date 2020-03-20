@@ -8,6 +8,7 @@ data(cereals)
 cereals$rating_search <- numeric_breaks_labels(cereals$rating, c(20, 40, 60, 80))
 
 
+cereals$all_na <- NA
 
 
 filter_span <- function(x){
@@ -28,7 +29,8 @@ cereal_filters <- shinyfilterset(
   data_filter("Manufacturer", "select"),
   data_filter("calories", "select"),
   data_filter("protein", "select"),
-  data_filter("rating_search", "select")
+  data_filter("rating_search", "select"),
+  data_filter("all_na", "select")
   
 )
 

@@ -95,8 +95,6 @@ checkboxes_input <- function(id, self){
     }  
   }
   
-  
-  
   options$label <- self$label
   
   options <- c(list(inputId = id), options)
@@ -106,6 +104,16 @@ checkboxes_input <- function(id, self){
   
 }
 
+
+date_range_input <- function(id, self){
+  
+  options <- self$options
+  options$label <- self$label
+  options <- c(list(inputId = id), options)
+  
+  list(ui = do.call(shiny::dateRangeInput, options))
+  
+}
 
 
 numeric_input <- function(id, self, type = c("min", "max")){

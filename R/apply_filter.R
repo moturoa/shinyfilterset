@@ -9,6 +9,13 @@ apply_filter <- function(data, value, object){
       return(data)
     }
     
+    # Custom filter function
+    if(!is.null(object$filter_function)){
+      
+      data <- object$filter_function(data, value)
+      return(data)
+    }
+    
     if(object$filter_ui %in% c("slider","numeric_range")){
       data <- dplyr::filter(data, 
                             !!sym(colname) >= value[1],

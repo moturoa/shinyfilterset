@@ -27,8 +27,7 @@ shinyfilterset <- function(...,
                            id = NULL){
   
   if(is.null(id)){
-    #id <- uuid::UUIDgenerate()
-    id <- random_id()
+    id <- uuid::UUIDgenerate()
   }
   
   DataFilterSet$new(..., 
@@ -42,9 +41,6 @@ shinyfilterset <- function(...,
   
 }
 
-
-#y <- x$cereal_filters
-#out <- do.call(shinyfilterset, lapply(names(y), function(nm)data_filter(nm, y[[nm]])))
 
 #' @export
 filter_section <- function(section_nr = 1, ...){
@@ -85,6 +81,8 @@ data_filter <- function(column_name,
                                       "numeric_min",  # numeric minimum
                                       "numeric_max",  # ... maximum
                                       
+                                      "date_range",
+                                      
                                       "switch"), 
                         label = column_name,
                         updates = TRUE,
@@ -96,6 +94,8 @@ data_filter <- function(column_name,
                         array_field = FALSE,  # category only
                         array_separator = ";",  # category only
                         round_digits = 1,
+                        filter_function = NULL, 
+                        static = FALSE,
                         
                         # sent to input method
                         options = list(),
@@ -106,8 +106,7 @@ data_filter <- function(column_name,
   search_method <- match.arg(search_method)
   
   if(is.null(id)){
-    #id <- uuid::UUIDgenerate()
-    id <- random_id()
+    id <- uuid::UUIDgenerate()
   }
 
    
@@ -123,6 +122,8 @@ data_filter <- function(column_name,
                  search_method = search_method,
                  round_digits = round_digits,
                  label = label,
+                 filter_function = filter_function,
+                 static = static,
                  options = options,
                  ui_section = ui_section)
   

@@ -115,7 +115,7 @@ is_empty <- function(x){
   if(is.null(x))return(TRUE)
   
   if(length(x) == 1){
-    out <- is.null(x) || x == ""
+    out <- is.null(x) || as.character(x) == ""
     out || is.na(out)  
   } else {
     sapply(x, is_empty)

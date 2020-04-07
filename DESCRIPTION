@@ -1,12 +1,12 @@
 Package: shinyfilterset
 Type: Package
 Title: An R6 Class for Collections of Data Filters in Shiny Applications
-Version: 0.7-4
+Version: 0.7-5
 Author: Remko Duursma
 Depends: shinyWidgets, shiny, uuid, R6
 Maintainer: Remko Duursma <remko@shintolabs.nl>
-Description: Define collections of data filters in shiny applications (sliders, pickers, checkboxes, etc.) with a common syntax, apply the filter set to data, auto-update filter settings, and much more.
-    data with ease. 
+Description: Define collections of data filters in shiny applications (sliders, pickers, checkboxes, etc.) 
+    with a common syntax, apply the filter set to data, auto-update filter settings, and much more.
 License: CC0
 Encoding: UTF-8
 RoxygenNote: 7.0.2

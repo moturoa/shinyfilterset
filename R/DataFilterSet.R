@@ -49,34 +49,42 @@ DataFilterSet <- R6::R6Class(
         # R6 class constructed with data_filter()
         obj <- self$filters[[i]]
         
+        if(obj$static){
+          
+          column_data <- NA
+          .range <- NA
+          .unique <- NA
+          
+        } else {
         
-        column_data <- data[[obj$column_name]]
+          column_data <- data[[obj$column_name]]
+          
+          # Text-based categorical filter
+          if(obj$filter_ui %in% c("picker","select","checkboxes")){
+            
+            if(is.factor(column_data)){
+              column_data <- as.character(column_data)
+            }
+            
+            .unique <- make_choices(column_data, obj$n_label, obj$sort, obj$array_field, obj$array_separator)
+            .range <- NULL
+            
+          } else if(obj$filter_ui %in% c("slider",
+                                         "numeric_min",
+                                         "numeric_max",
+                                         "numeric_range")){
+            
+            .unique <- NULL
+            .range <- range(column_data, na.rm = TRUE) 
+            
+          } else if(obj$filter_ui == "binary"){
+            
+            .unique <- c(TRUE,FALSE)
+            .range <- NULL
+            
+          }   
+        }
         
-        
-        # Text-based categorical filter
-        if(obj$filter_ui %in% c("picker","select","checkboxes")){
-          
-          if(is.factor(column_data)){
-            column_data <- as.character(column_data)
-          }
-          
-          .unique <- make_choices(column_data, obj$n_label, obj$sort, obj$array_field, obj$array_separator)
-          .range <- NULL
-          
-        } else if(obj$filter_ui %in% c("slider",
-                                       "numeric_min",
-                                       "numeric_max",
-                                       "numeric_range")){
-          
-          .unique <- NULL
-          .range <- range(column_data, na.rm = TRUE) 
-          
-        } else if(obj$filter_ui == "binary"){
-          
-          .unique <- c(TRUE,FALSE)
-          .range <- NULL
-          
-        } 
         
         self$filters[[i]]$set("range", .range)
         self$filters[[i]]$set("unique", .unique)
@@ -223,8 +231,13 @@ DataFilterSet <- R6::R6Class(
       
       for(i in seq_along(nms)){
         
+        # Load filter
         filt <- self$filters[[nms[i]]]
-        suppressWarnings(empt[i] <- is_empty(input[[filt$id]]))
+        
+        # Check if the filter returns a value
+        suppressWarnings(
+          empt[i] <- is_empty(input[[filt$id]])
+        )
         
         if(!empt[i]){
           data <- apply_filter(data, 

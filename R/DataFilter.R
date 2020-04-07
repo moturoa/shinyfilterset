@@ -14,6 +14,8 @@ DataFilter <- R6Class(
     unique = NULL,
     range = NULL,
     filter_ui = NULL,
+    filter_function = NULL,
+    static = NULL,
     options = NULL,
     #input_function = NULL,
     update_function = NULL,
@@ -28,6 +30,7 @@ DataFilter <- R6Class(
     
     # DataFilter$new()
     initialize = function(id, 
+                          label = NULL,
                           ui_section = NULL,
                           #column_data = NULL, 
                           column_name, 
@@ -41,10 +44,12 @@ DataFilter <- R6Class(
                           array_separator = ";",
                           search_method = NULL,
                           round_digits = NULL,
-                          label = NULL,
+                          filter_function = NULL,
+                          static = NULL,
                           options = list()){
       
       self$id <- id
+      self$label <- label
       self$ui_section <- ui_section
       self$column_name <- column_name
       self$all_choice <- all_choice
@@ -58,14 +63,22 @@ DataFilter <- R6Class(
       self$array_separator <- array_separator
       
       self$round_digits <- round_digits
-      
-      self$label <- label
+      self$filter_function <- filter_function
       
       self$options <- options
       self$filter_ui <- filter_ui
       
+      # Completely static filter: no init, no update of options / ranges.
+      self$static <- static
+      if(self$static){
+        self$updates <- FALSE
+      }
+      
       # register the function that can be used to update the input field,
       # choices, min/max, etc.
+      update_date_range <- function(x){x}
+      set_date_range <- function(x){x}
+      
       self$update_function <- switch(self$filter_ui,
                                      slider = update_slider,
                                      select = update_select,
@@ -74,7 +87,8 @@ DataFilter <- R6Class(
                                      numeric_min = update_numeric_min,
                                      numeric_max = update_numeric_max,
                                      numeric_range = update_range,
-                                     switch = update_material
+                                     switch = update_material,
+                                     date_range = update_date_range   # !!
       )
       
       # The function to set the value of the filter.
@@ -86,7 +100,8 @@ DataFilter <- R6Class(
                                   numeric_min = set_numeric_min,
                                   numeric_max = set_numeric_max,
                                   numeric_range = set_range,
-                                  switch = set_material
+                                  switch = set_material,
+                                  date_range = set_date_range   # !!
       )
       
       
@@ -99,25 +114,28 @@ DataFilter <- R6Class(
       self[[what]] <- value
     },
     
+    
     update = function(session, id, data, input, last_filter = ""){
       
       is_last <- isTRUE(!is.null(last_filter) && last_filter == self$column_name)
       
-      if(self$n_updates == 0 | (self$updates & !(is_last & !self$updates_on_last_use))){
-      
-        column_data <- data[[self$column_name]]
-        
-        # hier niet nodig? zie update functions
-        if(is.factor(column_data)){
-          column_data <- as.character(column_data)
-        }
-        
-        if(!is.null(column_data)){
-          do.call(self$update_function,
-                  list(session = session, id = id, self = self, data = column_data, input = input)
-          )
-          self$n_updates <- self$n_updates + 1
-        }
+      if(!self$static){
+        if(self$n_updates == 0 | (self$updates & !(is_last & !self$updates_on_last_use))){
+          
+          column_data <- data[[self$column_name]]
+          
+          # hier niet nodig? zie update functions
+          if(is.factor(column_data)){
+            column_data <- as.character(column_data)
+          }
+          
+          if(!is.null(column_data)){
+            do.call(self$update_function,
+                    list(session = session, id = id, self = self, data = column_data, input = input)
+            )
+            self$n_updates <- self$n_updates + 1
+          }
+        }  
       }
       
     },
@@ -141,7 +159,8 @@ DataFilter <- R6Class(
                     numeric_min = numeric_input(id, self, "min"),
                     numeric_max = numeric_input(id, self, "max"),
                     numeric_range = numericrange_input(id, self),
-                    switch = binary_input(id, self, type = "switch")
+                    switch = binary_input(id, self, type = "switch"),
+                    date_range = date_range_input(id, self)
                     
       )
       

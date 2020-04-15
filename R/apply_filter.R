@@ -17,9 +17,17 @@ apply_filter <- function(data, value, object){
     }
     
     if(object$filter_ui %in% c("slider","numeric_range")){
-      data <- dplyr::filter(data, 
-                            !!sym(colname) >= value[1],
-                            !!sym(colname) <= value[2])
+      
+      if(!object$pass_na){
+        data <- dplyr::filter(data,
+                              between(!!sym(colname), value[1], value[2]))  
+      } else {
+        data <- dplyr::filter(data, 
+                              is.na(colname) | 
+                                between(!!sym(colname), value[1], value[2]))  
+      }
+      
+      
     }
     
     if(object$filter_ui %in% c("select","picker","checkboxes")){

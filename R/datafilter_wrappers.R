@@ -96,6 +96,7 @@ data_filter <- function(column_name,
                         round_digits = 1,
                         filter_function = NULL, 
                         static = FALSE,
+                        pass_na = FALSE,
                         
                         # sent to input method
                         options = list(),
@@ -124,6 +125,7 @@ data_filter <- function(column_name,
                  label = label,
                  filter_function = filter_function,
                  static = static,
+                 pass_na = pass_na,
                  options = options,
                  ui_section = ui_section)
   

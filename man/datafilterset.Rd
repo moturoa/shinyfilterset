@@ -32,6 +32,7 @@ data_filter(
   round_digits = 1,
   filter_function = NULL,
   static = FALSE,
+  pass_na = FALSE,
   options = list(),
   ui_section = 1,
   id = NULL

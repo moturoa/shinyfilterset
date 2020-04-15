@@ -23,6 +23,7 @@ DataFilter <- R6Class(
     value_initial = NULL,
     n_label = NULL,
     sort = NULL,
+    pass_na = NULL,
     array_field = NULL,
     array_separator = NULL,
     round_digits = NULL,
@@ -46,6 +47,7 @@ DataFilter <- R6Class(
                           round_digits = NULL,
                           filter_function = NULL,
                           static = NULL,
+                          pass_na = NULL,
                           options = list()){
       
       self$id <- id
@@ -73,6 +75,8 @@ DataFilter <- R6Class(
       if(self$static){
         self$updates <- FALSE
       }
+      
+      self$pass_na <- pass_na
       
       # register the function that can be used to update the input field,
       # choices, min/max, etc.
@@ -141,6 +145,7 @@ DataFilter <- R6Class(
     },
     
     set_value = function(session, id, val){
+      
       do.call(self$set_function,
               list(session = session, id = id, self = self, value = val)
       )

@@ -11,51 +11,17 @@ mtcars$binary1 <- sample(c(TRUE,FALSE),nrow(mtcars),replace=TRUE)
 mtcars$binary2 <- sample(c(TRUE,FALSE),nrow(mtcars),replace=TRUE)
 
 
-my_filters <- shinyfilterset(
-  
-  filter_section(1,
-                 
-                 tags$h4("Filters (1)"),
-                 
-                 data_filter(column_data = mtcars$drat, 
-                             column_name = "drat", 
-                             filter_ui = "slider", 
-                             updates = TRUE,
-                             options = list(label = "Select drat value", ticks = FALSE)),
-                 data_filter(column_data = mtcars$disp, 
-                             column_name = "disp", 
-                             filter_ui = "numeric_range", 
-                             updates = TRUE,
-                             options = list(label = "Select disp value")),
-                 data_filter(column_data = mtcars$gear, 
-                             column_name = "gear", 
-                             filter_ui = "picker",
-                             updates = TRUE,
-                             options = list(label = "Select gear", selected = NULL))               
-                 
-  ),
-  filter_section(2,
-                 tags$h4("Filters (2)"),
-                 
-                 data_filter(column_data = mtcars$cyl, 
-                             column_name = "cyl", 
-                             filter_ui = "numeric_min",
-                             updates = TRUE,
-                             options = list(label = "Select cyl")),
-                 data_filter(column_name = "binary1", 
-                             filter_ui = "switch", 
-                             updates = TRUE,
-                             options = list(status = "primary")),
-                 data_filter(column_data = mtcars$binary2, 
-                             column_name = "binary2", 
-                             filter_ui = "checkboxes",
-                             updates = TRUE,
-                             options = list(choices = c("Ja" = TRUE, "Nee" = FALSE), 
-                                            selected = c(TRUE,FALSE), inline = TRUE))             
-                 
-  )
-  
-  
+my_filters <- shinyfilterset(data = mtcars,
+                             
+                             data_filter("drat","slider"),
+                             data_filter("disp", "numeric_range"),
+                             data_filter("gear", "picker"),
+                             data_filter("cyl", "numeric_min"),
+                             data_filter("binary1", "switch", updates = FALSE),
+                             data_filter("binary2", "checkboxes", updates = FALSE,
+                                         options = list(choices = c("Ja" = TRUE, "Nee" = FALSE), 
+                                                        selected = c(TRUE,FALSE), inline = TRUE))
+               
 )
 
 
@@ -66,13 +32,14 @@ testmoduleUI <- function(id){
   
   tagList(
       fluidRow(
-        column(4, uiOutput(ns("div_my_filters_1"))),
-        column(4, uiOutput(ns("div_my_filters_2"))),
+        column(4, uiOutput(ns("div_my_filters"))),
         column(4, 
                tags$br(),
                tags$br(),
-               actionButton(ns("btn_reset_filters"), "Reset", 
-                            icon = icon("refresh", lib = "glyphicon"), class = "btn btn-primary"),
+               actionButton(ns("btn_reset_filters"), 
+                            "Reset", 
+                            icon = icon("refresh", lib = "glyphicon"), 
+                            class = "btn btn-primary"),
                
                tags$h4("Used filters"),
                textOutput(ns("filterused")),
@@ -99,14 +66,15 @@ testmoduleUI <- function(id){
 
 testmodule <- function(input, output, session){ 
   
-  observe({
+  output$div_my_filters <- renderUI({
     input$btn_reset_filters
-    
-    output$div_my_filters_1 <- renderUI(my_filters$ui(ns = session$ns, section = 1))
-    output$div_my_filters_2 <- renderUI(my_filters$ui(ns = session$ns, section = 2))
+    my_filters$ui(ns = session$ns)
   })
-  
 
+  # observeEvent(input$btn_reset_filters, {
+  #   my_filters$reset_all()
+  # })
+  
   observeEvent(input$btn_load, {
     
     fils <- readRDS(input$sel_load)

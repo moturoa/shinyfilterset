@@ -72,12 +72,13 @@ DataFilterSet <- R6::R6Class(
           } else if(obj$filter_ui %in% c("slider",
                                          "numeric_min",
                                          "numeric_max",
-                                         "numeric_range")){
+                                         "numeric_range",
+                                         "date_range")){
             
             .unique <- NULL
             .range <- range(column_data, na.rm = TRUE) 
             
-          } else if(obj$filter_ui == "binary"){
+          } else if(obj$filter_ui == "switch"){
             
             .unique <- c(TRUE,FALSE)
             .range <- NULL

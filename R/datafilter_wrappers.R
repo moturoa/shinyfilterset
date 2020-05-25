@@ -14,6 +14,7 @@
 #' @rdname datafilterset
 #' @importFrom R6 R6Class
 #' @importFrom dplyr filter
+#' @importFrom dplyr between
 #' @importFrom rlang sym
 #' @importFrom uuid UUIDgenerate
 shinyfilterset <- function(..., 

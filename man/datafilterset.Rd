@@ -29,6 +29,7 @@ data_filter(
   search_method = c("equal", "regex"),
   array_field = FALSE,
   array_separator = ";",
+  array_comparison = "any",
   round_digits = 1,
   filter_function = NULL,
   static = FALSE,

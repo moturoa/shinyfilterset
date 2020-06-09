@@ -35,7 +35,8 @@ numericrange_input <- function(id, self){
   options$label <- self$label
 
   options <- c(list(inputId = id), options)
-  list(ui = do.call(shinyWidgets::numericRangeInput, options))
+  list(ui = do.call(shinyWidgets::numericRangeInput, options),
+       value = options$value)
 }
 
 

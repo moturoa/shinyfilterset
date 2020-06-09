@@ -94,6 +94,7 @@ data_filter <- function(column_name,
                         search_method = c("equal","regex"),  # category only
                         array_field = FALSE,  # category only
                         array_separator = ";",  # category only
+                        array_comparison = "any",
                         round_digits = 1,
                         filter_function = NULL, 
                         static = FALSE,
@@ -121,6 +122,7 @@ data_filter <- function(column_name,
                  all_choice = all_choice,
                  array_field = array_field,
                  array_separator = array_separator,
+                 array_comparison = array_comparison,
                  search_method = search_method,
                  round_digits = round_digits,
                  label = label,

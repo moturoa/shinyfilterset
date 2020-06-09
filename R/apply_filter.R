@@ -22,11 +22,12 @@ apply_filter <- function(data, value, object){
         data <- dplyr::filter(data,
                               between(!!sym(colname), value[1], value[2]))  
       } else {
+
         data <- dplyr::filter(data, 
-                              is.na(colname) | 
+                              is.na(!!sym(colname)) | 
                                 between(!!sym(colname), value[1], value[2]))  
+        
       }
-      
       
     }
     
@@ -44,7 +45,8 @@ apply_filter <- function(data, value, object){
           } else {
             data <- dplyr::filter(data, search_array(!!sym(colname), 
                                                      what = value, 
-                                                     array_separator = object$array_separator))
+                                                     array_separator = object$array_separator,
+                                                     array_comparison = object$array_comparison))
           }
           
           # Filter with regular expression

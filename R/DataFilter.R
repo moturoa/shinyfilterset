@@ -26,6 +26,7 @@ DataFilter <- R6Class(
     pass_na = NULL,
     array_field = NULL,
     array_separator = NULL,
+    array_comparison = NULL,
     round_digits = NULL,
     n_updates = 0,
     
@@ -43,6 +44,7 @@ DataFilter <- R6Class(
                           all_choice = NULL,
                           array_field = FALSE,
                           array_separator = ";",
+                          array_comparison = NULL,
                           search_method = NULL,
                           round_digits = NULL,
                           filter_function = NULL,
@@ -63,6 +65,7 @@ DataFilter <- R6Class(
       self$sort <- sort
       self$array_field <- array_field
       self$array_separator <- array_separator
+      self$array_comparison <- array_comparison
       
       self$round_digits <- round_digits
       self$filter_function <- filter_function

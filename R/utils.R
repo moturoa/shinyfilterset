@@ -100,11 +100,14 @@ vals
 
 # x = vector (array)
 # what = vector (OR)
-search_array <- function(x, what, array_separator = ";"){
+search_array <- function(x, what, array_separator = ";", array_comparison = c("all","any")){
   
   lis <- strsplit(x, array_separator)
+  
+  how <- base::get(match.arg(array_comparison))
+  
   sapply(lis, function(el){
-    any(what %in% el)
+    how(what %in% el)
   })
 }
 

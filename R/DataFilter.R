@@ -173,6 +173,7 @@ DataFilter <- R6Class(
       )
       
       self$value_initial <- out$value
+     
       self$n_updates <- 0
       
       return(out$ui)

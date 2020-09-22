@@ -43,7 +43,10 @@ update_slider <- function(session, id, self, data, input){
   
   if(length(data)){
     val <- range(data, na.rm=TRUE)
-    val <- round(val, digits = self$round_digits)
+    
+    val <- c(floor_digits(val[1], self$round_digits), 
+             ceiling_digits(val[2], self$round_digits))
+    
     shiny::updateSliderInput(session, id, value = val)
   }
 }
@@ -83,7 +86,8 @@ update_range <- function(session, id, self, data, input){
   
   if(length(data)){
     val <- range(data, na.rm=TRUE)
-    val <- round(val, digits = self$round_digits)
+    val <- c(floor_digits(val[1], self$round_digits), 
+             ceiling_digits(val[2], self$round_digits))
   
     # !! apparently updateNumericRangeInput has a bug that we have to re-set the label.
     shinyWidgets::updateNumericRangeInput(session, id, label = self$label, value = val)

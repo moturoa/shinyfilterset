@@ -6,15 +6,15 @@ slider_input <- function(id, self){
   options <- self$options
   
   if(!("value" %in% names(options))){
-    options$value <- self$range
+    options$value <- c(floor_digits(self$range[1], self$round_digits),
+                       ceiling_digits(self$range[2], self$round_digits))
   }
   
   options$label <- self$label
   
   options <- c(list(inputId = id), 
                options, 
-               list(min = floor_digits(self$range[1], self$round_digits), 
-                    max = ceiling_digits(self$range[2], self$round_digits)))
+               list(min = options$value[1], max = options$value[2]))
   
   list(ui = do.call(shiny::sliderInput, options),
        value = options$value)

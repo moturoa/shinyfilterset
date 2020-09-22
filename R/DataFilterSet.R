@@ -182,6 +182,11 @@ DataFilterSet <- R6::R6Class(
       
     },
     
+    used_filters2 = function(){
+      
+      callModule(private$used_filters_server2, self$id)
+      
+    },
     
     monitor = function(){
       
@@ -330,7 +335,23 @@ DataFilterSet <- R6::R6Class(
       
       return(vals)
       
+    },
+    
+    
+    used_filters_server2 = function(input, output, session){
+      
+      chk <- sapply(self$filters, function(x){
+        !isTRUE(all.equal(as.character(input[[x$id]]), 
+                          as.character(x$value_initial)))
+      })
+      
+      vals <- lapply(self$filters[chk], function(x)input[[x$id]])
+      
+      return(reactive(vals))
+      
     }
+    
+    
     
     
   )

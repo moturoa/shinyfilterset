@@ -5,16 +5,28 @@ slider_input <- function(id, self){
   
   options <- self$options
   
-  if(!("value" %in% names(options))){
+  if(is.null(options$value)){
     options$value <- c(floor_digits(self$range[1], self$round_digits),
                        ceiling_digits(self$range[2], self$round_digits))
   }
   
   options$label <- self$label
   
+  min_val <- ifelse(is.null(options$min), 
+                    options$value[1],
+                    options$min)
+  
+  max_val <- ifelse(is.null(options$max), 
+                    options$value[2],
+                    options$max)
+  
+  options$min <- NULL
+  options$max <- NULL
+  
   options <- c(list(inputId = id), 
                options, 
-               list(min = options$value[1], max = options$value[2]))
+               list(min = min_val, 
+                    max = max_val))
   
   list(ui = do.call(shiny::sliderInput, options),
        value = options$value)

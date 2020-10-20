@@ -30,6 +30,7 @@ cereal_filters <- shinyfilterset(
   data_filter("calories", "select"),
   data_filter("protein", "select"),
   data_filter("rating_search", "select"),
+  data_filter("rating", "slider", options = list(min = 0, max = 100)),
   data_filter("all_na", "select")
   
 )

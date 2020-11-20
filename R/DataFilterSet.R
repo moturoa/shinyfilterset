@@ -209,6 +209,7 @@ DataFilterSet <- R6::R6Class(
     
     reset_all = function(){
       
+      self$history <- c()
       callModule(private$reset_server, self$id)
       
     },

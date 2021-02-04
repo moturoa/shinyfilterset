@@ -1,3 +1,5 @@
+
+![](https://badgen.net/badge/shintolabs/production/green)
 # shinyfilterset 
 
 Create sets of data filters in Shiny applications with ease, with lots of customization options.
@@ -67,16 +69,9 @@ remotes::install_bitbucket("shintolabs/shinyfilterset", auth_user = "YOU", passw
 ```
 
 
+## Contact
 
-
-## Example app
-
-
-
-
-
-
-
+Remko Duursma
 
 
 

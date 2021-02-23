@@ -159,6 +159,8 @@ DataFilterSet <- R6::R6Class(
       
       last_fil <- self$history[length(self$history)]
       
+      #print(paste("LAST:", last_fil))
+      
       callModule(private$update_server, 
                  id = self$id,
                  data = data,
@@ -231,7 +233,7 @@ DataFilterSet <- R6::R6Class(
       
     },
     
-    filter_server = function(input, output, session, data){
+  filter_server = function(input, output, session, data){
       
       nms <- names(self$filters)
       empt <- c()
@@ -254,10 +256,10 @@ DataFilterSet <- R6::R6Class(
       }
 
       return(list(data = data, empty = empt))
-    },
+  },
     
     
-    update_server = function(input, output, session, data, last_filter){
+  update_server = function(input, output, session, data, last_filter){
       
       lapply( self$filters, function(x){
         
@@ -269,9 +271,9 @@ DataFilterSet <- R6::R6Class(
         
       })
       
-    },
+  },
     
-    load_server = function(input, output, session, vals){
+  load_server = function(input, output, session, vals){
       
       for(i in seq_along(vals)){
         
@@ -285,9 +287,9 @@ DataFilterSet <- R6::R6Class(
         
       }
       
-    },
+  },
     
-    reset_server = function(input, output, session){
+  reset_server = function(input, output, session){
       
       for(i in seq_along(self$filters)){
         
@@ -300,32 +302,42 @@ DataFilterSet <- R6::R6Class(
       }
       
       
-    },
+  },
     
-    monitor_server = function(input, output, session){
+  monitor_server = function(input, output, session){
       
       lapply(self$filters, function(x){
+
         
-        observeEvent(input[[x$id]], priority = 100, {
+        shinyjs::onclick(x$id, {
           
-          self$history <- c(self$history, x$column_name)
+          #print(paste("EVENT", x$column_name))
+          self$history <- c(self$history, x$column_name)  
           
         })
         
+        
+        # observeEvent(input[[x$id]], priority = 100, {
+        # 
+        #   #self$history <- c(self$history, x$column_name)
+        #   #print(paste("OBSERVE EVENT", x$column_name))
+        # 
+        # })
+        
       })
       
-    },
+  },
     
-    # notused
-    reactive_server = function(input, output, session){
+  # notused
+  reactive_server = function(input, output, session){
       
       lapply(self$filters, function(x){
         input[[x$id]]
       })
       
-    },
+  },
     
-    used_filters_server = function(input, output, session){
+  used_filters_server = function(input, output, session){
       
       chk <- sapply(self$filters, function(x){
         !isTRUE(all.equal(as.character(input[[x$id]]), 
@@ -336,10 +348,10 @@ DataFilterSet <- R6::R6Class(
       
       return(vals)
       
-    },
+  },
     
     
-    used_filters_server2 = function(input, output, session){
+  used_filters_server2 = function(input, output, session){
       
       chk <- sapply(self$filters, function(x){
         !isTRUE(all.equal(as.character(input[[x$id]]), 
@@ -350,7 +362,7 @@ DataFilterSet <- R6::R6Class(
       
       return(reactive(vals))
       
-    }
+  }
     
     
     

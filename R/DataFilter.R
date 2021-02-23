@@ -129,6 +129,8 @@ DataFilter <- R6Class(
       if(!self$static){
         if(self$n_updates == 0 | (self$updates & !(is_last & !self$updates_on_last_use))){
           
+          #print(paste(self$n_updates, "updating", self$column_name))
+          
           column_data <- data[[self$column_name]]
           
           # hier niet nodig? zie update functions
@@ -142,7 +144,7 @@ DataFilter <- R6Class(
             )
             self$n_updates <- self$n_updates + 1
           }
-        }  
+        } 
       }
       
     },

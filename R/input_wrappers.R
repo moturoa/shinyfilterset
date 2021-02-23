@@ -56,11 +56,15 @@ select_input <- function(id, self, type = c("select","picker")){
   
   type <- match.arg(type)
   input_field <- switch(type,
-                        select = shiny::selectInput,
+                        select = shiny::selectizeInput,
                         picker = shinyWidgets::pickerInput
   )
   
   options <- self$options
+  
+  if(type == "select"){
+    options$options <- list(plugins = 'remove_button')
+  }
   
   if(!("selected" %in% names(options))){
     

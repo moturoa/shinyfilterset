@@ -34,7 +34,7 @@ get_unique <- function(x, sort = TRUE, array_field = FALSE, array_separator = ";
 floor_digits <- function(x, digits){
   
   floor(x * 10^digits) / 10^digits
-  
+
 }
 
 

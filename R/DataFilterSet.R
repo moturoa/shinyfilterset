@@ -16,7 +16,14 @@ DataFilterSet <- R6::R6Class(
     ns = NS(NULL),
     all_data_on_null = NULL,
     last_filter = "",
-    initialize = function(..., data, id, updates, all_data_on_null, updates_on_last_use, n_label, .list){
+    initialize = function(..., 
+                          data, 
+                          id, 
+                          updates, 
+                          all_data_on_null, 
+                          updates_on_last_use, 
+                          n_label, 
+                          .list){
       
       self$id <- id
       self$all_data_on_null <- all_data_on_null

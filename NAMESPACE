@@ -2,6 +2,7 @@
 
 export(data_filter)
 export(filter_section)
+export(from_list_definition)
 export(numeric_breaks_labels)
 export(shinyfilterset)
 importFrom(R6,R6Class)

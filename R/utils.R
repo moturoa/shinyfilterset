@@ -62,6 +62,7 @@ numeric_breaks_categories <- function(x, breaks, round_digits = 1){
 
 make_choices <- function(x, n_label = TRUE, sort = TRUE, 
                          array_field = FALSE, array_separator = ";",
+                         select_choices = NULL,
                          selected = NULL){
   
   if(is.factor(x)){
@@ -83,12 +84,25 @@ make_choices <- function(x, n_label = TRUE, sort = TRUE,
   
   vals <- get_unique(x, sort, array_field, array_separator)
   
-  # if(all(tab == 1)){
-  #   return(vals)
-  # }
+  # Names of the options (if provided as named select_choices argument)
+  if(!is.null(select_choices) && !is.null(names(select_choices))){
+    
+    ii <- match(vals, select_choices)
+    names(vals) <- names(select_choices)[ii]
+    
+  } else {
+    names(vals) <- vals
+  }
+  
+  # Order of choices (if provided as named or unnamed select_choices argument)
+  if(!is.null(select_choices)){
+    vals <- vals[match(select_choices, vals)]
+    vals <- vals[!is.na(vals)]
+  }
+  
   
   if(n_label){
-    names(vals) <- paste0(vals, " (",tab,")")  
+    names(vals) <- paste0(names(vals), " (",tab,")")  
   }
   
   if(array_field && !is.null(selected)){

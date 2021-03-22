@@ -1,0 +1,22 @@
+filters:
+  Manufacturer:
+    section: 1
+    ui: "select"
+    label: "Merk"
+    tooltip: "tooltip voor filter"
+    updates: true
+    choices:
+      "Giraffe" : "G"
+      "Kellogg's" : "K"
+      "Nutri" : "N"
+      "Paard" : "P"
+      "Queen" : "Q"
+      "Ravijn" : "R"
+      "Aardbei" : "A"
+  protein:
+    section: 1
+    ui: "select"
+    label: "Eiwit"
+    tooltip: "g per g eiwit"
+    updates: true
+    choices: [6,2,3,4,5,1]

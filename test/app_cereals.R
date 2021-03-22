@@ -3,6 +3,7 @@ library(shiny)
 library(shinyfilterset)
 library(glue)
 library(lgrdata)
+library(shinyjs)
 data(cereals)
 
 cereals$rating_search <- numeric_breaks_labels(cereals$rating, c(20, 40, 60, 80))
@@ -37,6 +38,8 @@ cereal_filters <- shinyfilterset(
 
 
 ui <- fluidPage(
+  useShinyjs(),
+  
   fluidRow(
     column(6, 
            uiOutput("cereal_filters"),

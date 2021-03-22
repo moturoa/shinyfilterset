@@ -29,6 +29,7 @@ DataFilter <- R6Class(
     array_comparison = NULL,
     round_digits = NULL,
     n_updates = 0,
+    select_choices = NULL,
     
     # DataFilter$new()
     initialize = function(id, 
@@ -50,6 +51,7 @@ DataFilter <- R6Class(
                           filter_function = NULL,
                           static = NULL,
                           pass_na = NULL,
+                          select_choices = NULL,
                           options = list()){
       
       self$id <- id
@@ -72,6 +74,8 @@ DataFilter <- R6Class(
       
       self$options <- options
       self$filter_ui <- filter_ui
+      
+      self$select_choices <- select_choices
       
       # Completely static filter: no init, no update of options / ranges.
       self$static <- static

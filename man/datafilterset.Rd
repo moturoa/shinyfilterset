@@ -34,6 +34,7 @@ data_filter(
   filter_function = NULL,
   static = FALSE,
   pass_na = FALSE,
+  select_choices = NULL,
   options = list(),
   ui_section = 1,
   id = NULL

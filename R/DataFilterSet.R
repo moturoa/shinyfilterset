@@ -73,7 +73,9 @@ DataFilterSet <- R6::R6Class(
               column_data <- as.character(column_data)
             }
             
-            .unique <- make_choices(column_data, obj$n_label, obj$sort, obj$array_field, obj$array_separator)
+            .unique <- make_choices(column_data, obj$n_label, obj$sort, obj$array_field, obj$array_separator,
+                                    obj$select_choices)
+            
             .range <- NULL
             
           } else if(obj$filter_ui %in% c("slider",

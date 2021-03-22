@@ -3,6 +3,7 @@
 update_select <- function(session, id, self, data, input){
   
   vals <- make_choices(data, self$n_label, self$sort, self$array_field, self$array_separator,
+                       self$select_choices,
                        selected = input[[id]])
 
   shiny::updateSelectInput(session, id, choices = vals, selected = input[[id]])
@@ -13,6 +14,7 @@ update_select <- function(session, id, self, data, input){
 update_picker <- function(session, id, self, data, input){
   
   vals <- make_choices(data, self$n_label, self$sort, self$array_field, self$array_separator,
+                       self$select_choices,
                        selected = input[[id]])
   
   shinyWidgets::updatePickerInput(session, id, choices = vals, selected = input[[id]])
@@ -22,6 +24,7 @@ update_picker <- function(session, id, self, data, input){
 update_checkboxes <- function(session, id, self, data, input){
   
   vals <- make_choices(data, self$n_label, self$sort, self$array_field, self$array_separator,
+                       self$select_choices,
                        selected = input[[id]])
   
   if(is.null(input[[id]])){

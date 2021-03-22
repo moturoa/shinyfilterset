@@ -99,6 +99,7 @@ data_filter <- function(column_name,
                         filter_function = NULL, 
                         static = FALSE,
                         pass_na = FALSE,
+                        select_choices = NULL,
                         
                         # sent to input method
                         options = list(),
@@ -130,7 +131,8 @@ data_filter <- function(column_name,
                  static = static,
                  pass_na = pass_na,
                  options = options,
-                 ui_section = ui_section)
+                 ui_section = ui_section,
+                 select_choices = select_choices)
   
 }
 

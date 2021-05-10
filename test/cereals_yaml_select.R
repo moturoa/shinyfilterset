@@ -21,16 +21,15 @@ cereal_filters <- shinyfilterset(
 
 
 
-
-
 ui <- fluidPage(
+  
   useShinyjs(),
   shintoshiny_dependencies(),
   
   fluidRow(
     column(6, 
            uiOutput("cereal_filters"),
-           actionButton("btn_reset_filters","Reset", class="btn-primary")
+           actionButton("btn_reset_filters", "Reset", class = "btn-primary")
            
            
     ),
@@ -42,6 +41,7 @@ ui <- fluidPage(
     )
   )
 )
+
 
 server <- function(input, output, session) {
   
@@ -68,7 +68,6 @@ server <- function(input, output, session) {
   })
   
   
-  
   output$cereal_rows <- renderUI({
     tags$h2(paste("Aantal rijen: ", nrow(data_filtered())))
   })
@@ -78,8 +77,6 @@ server <- function(input, output, session) {
   output$cereal_filtered <- renderTable({
     data_filtered()[,c("Manufacturer","calories","sodium","protein","sugars")]
   })
-  
-  
   
   
 }

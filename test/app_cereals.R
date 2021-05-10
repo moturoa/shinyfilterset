@@ -64,6 +64,7 @@ ui <- fluidPage(
   )
 )
 
+
 server <- function(input, output, session) {
   
   observeEvent(input$browse, browser())

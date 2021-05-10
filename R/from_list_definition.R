@@ -39,6 +39,7 @@ from_list_definition <- function(lis, ...){
                 array_field = m_get("array", FALSE),
                 pass_na = m_get("pass_na", TRUE),
                 select_choices = m_get("choices", NULL),
+                ...,
                 options = list(width = "100%"))
   }
   

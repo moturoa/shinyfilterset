@@ -79,22 +79,17 @@ make_choices <- function(x, n_label = TRUE, sort = TRUE,
   
   vals <- get_unique(x, sort, array_field, array_separator)
   
-  # Names of the options (if provided as named select_choices argument)
-  if(!is.null(select_choices) && !is.null(names(select_choices))){
-    
-    ii <- match(vals, select_choices)
-    names(vals) <- names(select_choices)[ii]
-    
-  } else {
-    names(vals) <- vals
-  }
-  
-  # Order of choices (if provided as named or unnamed select_choices argument)
   if(!is.null(select_choices)){
-    vals <- vals[match(select_choices, vals)]
-    vals <- vals[!is.na(vals)]
+    
+    if(is.list(select_choices[[1]])){
+      vals <- lapply(select_choices, function(lis){
+        lis[lis %in% vals]
+      })  
+    } else {
+      vals <- select_choices[select_choices %in% vals]
+    }
+    
   }
-  
   
   if(n_label){
     if(is.null(select_choices)){

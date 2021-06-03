@@ -87,9 +87,7 @@ DataFilter <- R6Class(
       
       # register the function that can be used to update the input field,
       # choices, min/max, etc.
-      update_date_range <- function(x){x}
-      set_date_range <- function(x){x}
-      
+
       self$update_function <- switch(self$filter_ui,
                                      slider = update_slider,
                                      select = update_select,

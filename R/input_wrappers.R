@@ -127,7 +127,13 @@ date_range_input <- function(id, self){
   options$label <- self$label
   options <- c(list(inputId = id), options)
   
-  list(ui = do.call(shiny::dateRangeInput, options))
+  if(!("start" %in% names(options))){
+    options$start <- self$range[1]
+    options$end <- self$range[2]
+  }
+  
+  list(ui = do.call(shiny::dateRangeInput, options),
+       value = c(options$start, options$end))
   
 }
 

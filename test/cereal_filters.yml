@@ -22,3 +22,14 @@ filters:
     tooltip: "g per g eiwit"
     updates: true
     choices: [6,2,3,4,5,1]
+  datum_wijziging:
+    section: 1
+    ui: "date_range"
+    label: "Datum"
+    tooltip: "datum tooltip"
+  sodium:
+    section: 1
+    ui: "numeric_range"
+    label: "Sodium"
+    tooltip: "sodium tooltip"
+

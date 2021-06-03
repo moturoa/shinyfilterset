@@ -7,6 +7,7 @@ library(lgrdata)
 library(shinyjs)
 data(cereals)
 
+cereals$datum_wijziging <- as.Date("2021-05-21")
 
 library(shintoshiny)
 
@@ -29,7 +30,10 @@ ui <- fluidPage(
   fluidRow(
     column(6, 
            uiOutput("cereal_filters"),
-           actionButton("btn_reset_filters", "Reset", class = "btn-primary")
+           actionButton("btn_reset_filters", "Reset", class = "btn-primary"),
+           
+           tags$hr(),
+           verbatimTextOutput("used")
            
            
     ),
@@ -50,6 +54,12 @@ server <- function(input, output, session) {
   data_filtered <- reactive({
     
     cereal_filters$apply(cereals)
+    
+  })
+  
+  output$used <- renderPrint({
+    
+    cereal_filters$used_filters2()()  
     
   })
   

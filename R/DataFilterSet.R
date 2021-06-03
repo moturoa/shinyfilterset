@@ -361,7 +361,6 @@ DataFilterSet <- R6::R6Class(
     
     
   used_filters_server2 = function(input, output, session){
-      
       chk <- sapply(self$filters, function(x){
         !isTRUE(all.equal(as.character(input[[x$id]]), 
                           as.character(x$value_initial)))

@@ -41,11 +41,11 @@ set_numeric_max <- function(session, id, self, value){
   
 }
 
-set_date_range <- function(session, id, self, data, input){
+set_date_range <- function(session, id, self, value){
   
   shiny::updateDateRangeInput(session, id, 
-                              start = min(data, na.rm = TRUE),
-                              end = max(data, na.rm = TRUE))
+                              start = value[1],
+                              end = value[2])
   
 }
 

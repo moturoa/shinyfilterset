@@ -173,7 +173,6 @@ DataFilter <- R6Class(
                     numeric_range = numericrange_input(id, self),
                     switch = binary_input(id, self, type = "switch"),
                     date_range = date_range_input(id, self)
-                    
       )
       
       self$value_initial <- out$value

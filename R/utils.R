@@ -95,7 +95,7 @@ make_choices <- function(x, n_label = TRUE, sort = TRUE,
     if(is.null(select_choices)){
       names(vals) <- paste0(vals, " (",tab,")")    
     } else {
-      warning("n_label not used when select choices passed - buggy for now") 
+      #warning("n_label not used when select choices passed - buggy for now") 
     }
   }
   

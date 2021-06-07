@@ -16,7 +16,7 @@ apply_filter <- function(data, value, object){
       return(data)
     }
     
-    if(object$filter_ui %in% c("slider","numeric_range")){
+    if(object$filter_ui %in% c("slider","numeric_range","date_range")){
       
       if(!object$pass_na){
         data <- dplyr::filter(data,

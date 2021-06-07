@@ -31,5 +31,6 @@ filters:
     section: 1
     ui: "numeric_range"
     label: "Sodium"
+    updates: true
     tooltip: "sodium tooltip"
 

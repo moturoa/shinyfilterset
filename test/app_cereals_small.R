@@ -29,7 +29,8 @@ cereal_filters <- shinyfilterset(
   
   data_filter("Manufacturer", "select"),
   data_filter("calories", "select"),
-  data_filter("protein", "select")
+  data_filter("protein", "select"),
+  data_filter("rating", "numeric_range", options = list(value=c(0,100)), updates = FALSE, static = TRUE)
   
 )
 
@@ -64,7 +65,7 @@ server <- function(input, output, session) {
   
   
   data_filtered <- reactive({
-    
+
     #print(paste("apply", sample(1:1000,1)))
     cereal_filters$apply(cereals)
     
@@ -79,9 +80,7 @@ server <- function(input, output, session) {
   
   
   observeEvent(input$btn_reset_filters,  {
-    
     cereal_filters$reset_all()
-    
   })
   
   

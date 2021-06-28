@@ -43,7 +43,6 @@ numericrange_input <- function(id, self){
                        ceiling_digits(self$range[2], self$round_digits))
 
   }
-  
   options$label <- self$label
 
   options <- c(list(inputId = id), options)

@@ -31,6 +31,11 @@ from_list_definition <- function(lis, ...){
       }
     }
     
+    opts <- list(width = "100%")
+    if(!is.null(obj$value)){
+      opts <- c(opts, list(value = obj$value))
+    }
+    
     data_filter(obj$column_name, 
                 filter_ui = obj$ui,
                 label = lab,
@@ -39,8 +44,9 @@ from_list_definition <- function(lis, ...){
                 array_field = m_get("array", FALSE),
                 pass_na = m_get("pass_na", TRUE),
                 select_choices = m_get("choices", NULL),
+                static = m_get("static", FALSE),
                 ...,
-                options = list(width = "100%"))
+                options = opts)
   }
   
   lapply(lis, make_data_filter)

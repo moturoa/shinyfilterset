@@ -10,6 +10,7 @@ library(shinyjs)
 
 cereals$rating_search <- numeric_breaks_labels(cereals$rating, c(20, 40, 60, 80))
 
+cereals$boolean <- sample(c(TRUE,FALSE), nrow(cereals), replace = TRUE)
 
 filter_span <- function(x){
   span(x, 
@@ -30,7 +31,9 @@ cereal_filters <- shinyfilterset(
   data_filter("Manufacturer", "select"),
   data_filter("calories", "select"),
   data_filter("protein", "select"),
-  data_filter("rating", "numeric_range", options = list(value=c(0,100)), updates = FALSE, static = TRUE)
+  data_filter("rating", "numeric_range", options = list(value=c(0,100)), updates = FALSE, static = TRUE),
+  data_filter("boolean", "checkboxes", updates = FALSE, static = TRUE, 
+              options = list(choices = c("Ja" = TRUE, "Nee" = FALSE), selected = c(TRUE,FALSE), inline = TRUE))
   
 )
 
@@ -43,7 +46,6 @@ ui <- fluidPage(
     column(6, 
            uiOutput("cereal_filters"),
            actionButton("btn_reset_filters","Reset", class="btn-primary")
-           
            
     ),
     column(6,

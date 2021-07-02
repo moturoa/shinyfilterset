@@ -8,6 +8,8 @@ library(shinyjs)
 data(cereals)
 
 cereals$datum_wijziging <- as.Date("2021-05-21")
+cereals$boolean <- sample(c(TRUE,FALSE), nrow(cereals), replace = TRUE)
+
 
 library(shintoshiny)
 

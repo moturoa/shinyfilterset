@@ -100,7 +100,7 @@ select_input <- function(id, self, type = c("select","picker")){
 checkboxes_input <- function(id, self){
   
   options <- self$options
-  
+
   if(self$filter_ui == "checkboxes"){
     if(!("selected" %in% names(options))){
       options$selected <- NULL

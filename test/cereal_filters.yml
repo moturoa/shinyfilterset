@@ -33,4 +33,13 @@ filters:
     label: "Sodium"
     updates: true
     tooltip: "sodium tooltip"
-
+  boolean:
+    section: 2
+    ui: "checkboxes"
+    label: "Logisch toch"
+    updates: false
+    #static: true
+    choices:
+      "Ja" : true
+      "Nee": false
+    selected: [true,false]

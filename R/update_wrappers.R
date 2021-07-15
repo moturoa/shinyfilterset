@@ -6,7 +6,7 @@ update_select <- function(session, id, self, data, input){
                        self$select_choices,
                        selected = input[[id]])
 
-  shiny::updateSelectizeInput(session, id, choices = vals, selected = input[[id]], server = TRUE)
+  shiny::updateSelectizeInput(session, id, choices = vals, selected = input[[id]], server = FALSE)
   
 }
 

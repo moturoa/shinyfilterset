@@ -85,6 +85,21 @@ select_input <- function(id, self, type = c("select","picker")){
     }
     
   }
+
+  if(type == "picker"){
+    options <- c(options, 
+                 list(options = list(`actions-box` = TRUE, 
+                      `deselect-all-text` = "Alles uit", 
+                      `dropdown-align-right` = TRUE, 
+                      `selected-text-format` = "count > 3", 
+                      `none-selected-text` = "Geen selectie", 
+                      `select-all-text` = "Alles aan", 
+                      `none-results-text` = "Geen selectie", 
+                      `count-selected-text` = ">3 Geselecteerd", 
+                      `dropup-auto` = FALSE)))
+  }
+  
+  
   
   options$label <- self$label
   

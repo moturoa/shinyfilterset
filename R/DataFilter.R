@@ -27,6 +27,7 @@ DataFilter <- R6Class(
     array_field = NULL,
     array_separator = NULL,
     array_comparison = NULL,
+    server = NULL,
     round_digits = NULL,
     n_updates = 0,
     select_choices = NULL,
@@ -46,6 +47,7 @@ DataFilter <- R6Class(
                           array_field = FALSE,
                           array_separator = ";",
                           array_comparison = NULL,
+                          server = NULL,
                           search_method = NULL,
                           round_digits = NULL,
                           filter_function = NULL,
@@ -68,6 +70,7 @@ DataFilter <- R6Class(
       self$array_field <- array_field
       self$array_separator <- array_separator
       self$array_comparison <- array_comparison
+      self$server <- server
       
       self$round_digits <- round_digits
       self$filter_function <- filter_function
@@ -93,6 +96,7 @@ DataFilter <- R6Class(
                                      select = update_select,
                                      checkboxes = update_checkboxes,
                                      picker = update_picker,
+                                     pickersearch = update_picker,
                                      numeric_min = update_numeric_min,
                                      numeric_max = update_numeric_max,
                                      numeric_range = update_range,
@@ -106,6 +110,7 @@ DataFilter <- R6Class(
                                   select = set_select,
                                   checkboxes = set_checkboxes,
                                   picker = set_picker,
+                                  pickersearch = set_picker,
                                   numeric_min = set_numeric_min,
                                   numeric_max = set_numeric_max,
                                   numeric_range = set_range,
@@ -168,6 +173,7 @@ DataFilter <- R6Class(
                     select = select_input(id, self),
                     checkboxes = checkboxes_input(id, self),
                     picker = select_input(id, self, type = "picker"),
+                    pickersearch = select_input(id, self, type = "pickersearch"),
                     numeric_min = numeric_input(id, self, "min"),
                     numeric_max = numeric_input(id, self, "max"),
                     numeric_range = numericrange_input(id, self),

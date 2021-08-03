@@ -73,6 +73,7 @@ filter_section <- function(section_nr = 1, ...){
 #' @export
 data_filter <- function(column_name, 
                         filter_ui = c("picker",   # category
+                                      "pickersearch",
                                       "select",
                                       "checkboxes",
                                       
@@ -95,6 +96,7 @@ data_filter <- function(column_name,
                         array_field = FALSE,  # category only
                         array_separator = ";",  # category only
                         array_comparison = "any",
+                        server = FALSE,
                         round_digits = 1,
                         filter_function = NULL, 
                         static = FALSE,
@@ -124,6 +126,7 @@ data_filter <- function(column_name,
                  array_field = array_field,
                  array_separator = array_separator,
                  array_comparison = array_comparison,
+                 server = server,
                  search_method = search_method,
                  round_digits = round_digits,
                  label = label,

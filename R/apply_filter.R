@@ -31,7 +31,7 @@ apply_filter <- function(data, value, object){
       
     }
     
-    if(object$filter_ui %in% c("select","picker","checkboxes")){
+    if(object$filter_ui %in% c("select","picker","pickersearch","checkboxes")){
       
       # 'all_choice' = single choice that acts as all selector (e.g. "All options")
       if(is.null(object$all_choice) || 

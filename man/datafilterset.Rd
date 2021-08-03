@@ -18,8 +18,8 @@ shinyfilterset(
 
 data_filter(
   column_name,
-  filter_ui = c("picker", "select", "checkboxes", "slider", "numeric_range",
-    "numeric_min", "numeric_max", "date_range", "switch"),
+  filter_ui = c("picker", "pickersearch", "select", "checkboxes", "slider",
+    "numeric_range", "numeric_min", "numeric_max", "date_range", "switch"),
   label = column_name,
   updates = TRUE,
   updates_on_last_use = FALSE,
@@ -30,6 +30,7 @@ data_filter(
   array_field = FALSE,
   array_separator = ";",
   array_comparison = "any",
+  server = FALSE,
   round_digits = 1,
   filter_function = NULL,
   static = FALSE,

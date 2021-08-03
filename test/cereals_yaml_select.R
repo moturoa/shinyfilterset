@@ -10,6 +10,7 @@ data(cereals)
 cereals$datum_wijziging <- as.Date("2021-05-21")
 cereals$boolean <- sample(c(TRUE,FALSE), nrow(cereals), replace = TRUE)
 
+cereals$naam <- replicate(nrow(cereals),paste(sample(letters,5), collapse=""))
 
 library(shintoshiny)
 
@@ -87,7 +88,7 @@ server <- function(input, output, session) {
   
   
   output$cereal_filtered <- renderTable({
-    data_filtered()[,c("Manufacturer","calories","sodium","protein","sugars")]
+    data_filtered()[,c("naam","Manufacturer","calories","sodium","protein","sugars")]
   })
   
   

@@ -49,6 +49,7 @@ from_list_definition <- function(lis, ...){
                 pass_na = m_get("pass_na", TRUE),
                 select_choices = m_get("choices", NULL),
                 static = m_get("static", FALSE),
+                server = m_get("server", FALSE),
                 ...,
                 options = opts)
   }

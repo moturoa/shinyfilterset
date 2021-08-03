@@ -1,4 +1,9 @@
 filters:
+  naam:
+    section: 1
+    ui: "pickersearch"
+    label: "Naam"
+    updates: false
   Manufacturer:
     section: 1
     ui: "select"

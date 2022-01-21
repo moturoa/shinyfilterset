@@ -52,7 +52,7 @@ set_date_range <- function(session, id, self, value){
 set_range <- function(session, id, self, value){
   
   # !! apparently updateNumericRangeInput has a bug that we have to re-set the label.
-  shinyWidgets::updateNumericRangeInput(session, id, label = self$label, value = value)
+  shinyWidgets::updateNumericRangeInput(session, id, value = value)  #label = self$label, 
   
 }
 

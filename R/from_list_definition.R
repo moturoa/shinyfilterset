@@ -7,11 +7,21 @@ from_list_definition <- function(lis, ...){
     lis[[i]]$column_name <- nms[i]
   }
   
+  # make_tooltip <- function (label, helptext){
+  #   tagList(label, HTML(as.character(glue::glue("<span class='glyphicon glyphicon-info-sign' ", 
+  #                   "data-html = 'true' ", "data-toggle = 'tooltip' ", 
+  #                   "data-original-title='Help' ", 
+  #                   "title='{helptext}' ", 
+  #                   "></span>"))))
+  # }
+  
+  
   make_data_filter <- function(obj){
     
     lab <- if(!is.null(obj$tooltip)){
       
       shintoshiny::label_tooltip(obj$label, obj$tooltip)
+      #make_tooltip(obj$label, obj$tooltip)
       
     } else {
       

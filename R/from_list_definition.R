@@ -50,6 +50,14 @@ from_list_definition <- function(lis, ...){
       opts <- c(opts, list(selected = obj$selected))
     }
     
+    if(!is.null(obj$inline)){
+      opts <- c(opts, list(inline = obj$inline))
+    }
+    
+    if(!is.null(obj$right)){
+      opts <- c(opts, list(right = obj$right))
+    }
+    
     data_filter(obj$column_name, 
                 filter_ui = obj$ui,
                 label = lab,

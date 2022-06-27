@@ -1,10 +1,15 @@
 
 
 library(shiny)
-library(shinyfilterset)
 library(glue)
 library(lgrdata)
 library(shinyjs)
+library(softui)
+
+
+#library(shinyfilterset)
+devtools::load_all()
+
 data(cereals)
 
 cereals$datum_wijziging <- as.Date("2021-05-21")
@@ -25,26 +30,30 @@ cereal_filters <- shinyfilterset(
 
 
 
-ui <- fluidPage(
+ui <- softui::simple_page(
   
   useShinyjs(),
   shintoshiny_dependencies(),
   
-  fluidRow(
-    column(6, 
-           uiOutput("cereal_filters"),
-           actionButton("btn_reset_filters", "Reset", class = "btn-primary"),
-           
-           tags$hr(),
-           verbatimTextOutput("used")
-           
-           
-    ),
-    column(6,
-           uiOutput("cereal_rows"),
-           
-           tags$h4("Gefilterde data"),
-           tableOutput("cereal_filtered")
+  softui::box(title = "Filter test",
+              
+    softui::fluid_row(
+      column(4, 
+             uiOutput("cereal_filters"),
+             actionButton("btn_reset_filters", "Reset", class = "btn-primary"),
+             
+             tags$hr(),
+             verbatimTextOutput("used")
+             
+             
+      ),
+      column(2),
+      column(6,
+             uiOutput("cereal_rows"),
+             
+             tags$h4("Gefilterde data"),
+             tableOutput("cereal_filtered")
+      )
     )
   )
 )

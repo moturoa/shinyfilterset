@@ -1,7 +1,7 @@
 filters:
   naam:
     section: 1
-    ui: "pickersearch"
+    ui: "select"
     label: "Naam"
     updates: false
   Manufacturer:

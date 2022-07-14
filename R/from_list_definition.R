@@ -1,5 +1,6 @@
 #' Convert a list definition from YAML for shinyfilterset
 #' @export
+#' @importFrom tippy with_tippy
 from_list_definition <- function(lis, ...){
   
   nms <- names(lis)
@@ -10,9 +11,9 @@ from_list_definition <- function(lis, ...){
   # gaat ook naar softui, maar shinyfilterset mag niet afhangen van softui
   add_tooltip <- function(txt, hlp){
     
-    tags$span(txt, prompter::add_prompt(tags$span(shiny::icon("info-circle")), 
-                                        position = "top",
-                                        message = hlp))
+    tags$span(txt, tippy::with_tippy(element = tags$span(shiny::icon("info-circle")), 
+                                       tooltip = htmltools::HTML(hlp),
+                                       placement = "top", arrow = TRUE))
     
   }
   

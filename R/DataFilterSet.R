@@ -67,7 +67,7 @@ DataFilterSet <- R6::R6Class(
           column_data <- data[[obj$column_name]]
           
           # Text-based categorical filter
-          if(obj$filter_ui %in% c("picker","pickersearch","select","checkboxes")){
+          if(obj$filter_ui %in% c("picker","pickersearch","select","checkboxes","virtualsearch")){
             
             if(is.factor(column_data)){
               column_data <- as.character(column_data)

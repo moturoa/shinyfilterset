@@ -21,6 +21,16 @@ update_picker <- function(session, id, self, data, input){
   
 }
 
+update_virtual <- function(session, id, self, data, input){
+  
+  vals <- make_choices(data, self$n_label, self$sort, self$array_field, self$array_separator,
+                       self$select_choices,
+                       selected = input[[id]])
+  
+  shinyWidgets::updateVirtualSelect(id, choices = vals, selected = input[[id]], session = session)
+  
+}
+
 update_checkboxes <- function(session, id, self, data, input){
   
   vals <- make_choices(data, self$n_label, self$sort, self$array_field, self$array_separator,

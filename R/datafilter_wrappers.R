@@ -74,6 +74,7 @@ filter_section <- function(section_nr = 1, ...){
 data_filter <- function(column_name, 
                         filter_ui = c("picker",   # category
                                       "pickersearch",
+                                      "virtualsearch",
                                       "select",
                                       "checkboxes",
                                       

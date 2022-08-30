@@ -28,6 +28,14 @@ set_picker <- function(session, id, self, value){
   
 }
 
+set_virtual <- function(session, id, self, value){
+  
+  if(is.null(value))value <- character(0)
+  
+  shinyWidgets::updateVirtualSelect(id, selected = value, session = session)
+  
+}
+
 set_numeric_min <- function(session, id, self, value){
   
   shiny::updateNumericInput(session, id, value = value)

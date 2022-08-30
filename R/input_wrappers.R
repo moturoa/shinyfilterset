@@ -51,13 +51,14 @@ numericrange_input <- function(id, self){
 }
 
 
-select_input <- function(id, self, type = c("select","picker","pickersearch")){
+select_input <- function(id, self, type = c("select","picker","pickersearch","virtualsearch")){
   
   type <- match.arg(type)
   input_field <- switch(type,
                         select = shiny::selectizeInput,
                         picker = shinyWidgets::pickerInput,
-                        pickersearch = shinyWidgets::pickerInput
+                        pickersearch = shinyWidgets::pickerInput,
+                        virtualsearch = shinyWidgets::virtualSelectInput
   )
   
   options <- self$options
@@ -113,6 +114,20 @@ select_input <- function(id, self, type = c("select","picker","pickersearch")){
                                      `none-results-text` = "Geen selectie", 
                                      `count-selected-text` = ">3 Geselecteerd", 
                                      `dropup-auto` = FALSE)))
+  }
+  
+  if(type == "virtualsearch"){
+    options <- c(options,
+                 list(search = TRUE,
+                      hideClearButton = FALSE,
+                      placeholder = "Maak selectie ...",
+                      noOptionsText = "Geen keuze mogelijk",
+                      noSearchResultsText = "Geen resultaten",
+                      selectAllText = "Selecteer alles",
+                      searchPlaceholderText = "Zoeken ...",
+                      optionsSelectedText = "Geselecteerd",
+                      allOptionsSelectedText = "Alles geselecteerd"
+                      ))
   }
   
   

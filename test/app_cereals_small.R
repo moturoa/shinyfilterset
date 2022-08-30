@@ -31,6 +31,7 @@ cereal_filters <- shinyfilterset(
   data_filter("Manufacturer", "select"),
   data_filter("calories", "select"),
   data_filter("protein", "select"),
+  data_filter("Manufacturer", "virtualsearch"),
   data_filter("rating", "numeric_range", options = list(value=c(0,100)), updates = FALSE, static = TRUE),
   data_filter("boolean", "checkboxes", updates = FALSE, static = TRUE, 
               options = list(choices = c("Ja" = TRUE, "Nee" = FALSE), selected = c(TRUE,FALSE), inline = TRUE))

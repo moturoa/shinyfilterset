@@ -10,7 +10,7 @@ from_list_definition <- function(lis, ...){
   # gaat ook naar softui, maar shinyfilterset mag niet afhangen van softui
   add_tooltip <- function(txt, hlp){
     
-    tags$span(txt, prompter::add_prompt(tags$span(shiny::icon("info-circle")), 
+    tags$span(txt, prompter::add_prompt(tags$span(shiny::icon("circle-info")), 
                                         position = "top",
                                         message = hlp))
     

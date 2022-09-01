@@ -7,14 +7,23 @@ from_list_definition <- function(lis, ...){
     lis[[i]]$column_name <- nms[i]
   }
   
-  # gaat ook naar softui, maar shinyfilterset mag niet afhangen van softui
+  #gaat ook naar softui, maar shinyfilterset mag niet afhangen van softui
+  # add_tooltip <- function(txt, hlp){
+  # 
+  #   tags$span(txt, prompter::add_prompt(tags$span(shiny::icon("circle-info")),
+  #                                       position = "top",
+  #                                       message = hlp))
+  # 
+  # }
+
+    
   add_tooltip <- function(txt, hlp){
-    
-    tags$span(txt, prompter::add_prompt(tags$span(shiny::icon("circle-info")), 
-                                        position = "top",
-                                        message = hlp))
-    
+
+    tags$span(txt, tippy::tippy(tags$span(shiny::icon("circle-info")), hlp))
+
   }
+  
+  
   
   
   make_data_filter <- function(obj){

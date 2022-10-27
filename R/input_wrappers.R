@@ -67,6 +67,7 @@ select_input <- function(id, self, type = c("select","picker","pickersearch","vi
     options$options <- list(plugins = 'remove_button')
   }
   
+
   if(!("selected" %in% names(options))){
     
     options$selected <- NULL
@@ -119,6 +120,7 @@ select_input <- function(id, self, type = c("select","picker","pickersearch","vi
   if(type == "virtualsearch"){
     options <- c(options,
                  list(search = TRUE,
+                      zIndex = 10,
                       hideClearButton = FALSE,
                       placeholder = "Maak selectie ...",
                       noOptionsText = "Geen keuze mogelijk",

@@ -4,6 +4,9 @@ apply_filter <- function(data, value, object){
   
     colname <- object$column_name
     
+    # If we have no data, return data
+    if(nrow(data) == 0)return(data)
+    
     # If the filter UI has not been generated yet
     if(is.null(value)){
       return(data)

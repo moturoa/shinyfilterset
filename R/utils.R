@@ -19,7 +19,11 @@ get_unique <- function(x, sort = TRUE, array_field = FALSE, array_separator = ";
       els <- strsplit(x, array_separator)
     }
 
-    out <- unique(do.call(c, els))  
+    if(is.list(els)){
+      els <- do.call(c, els)
+    }
+    
+    out <- unique(els)
     
   } else {
     out <- unique(x)
@@ -87,7 +91,12 @@ make_choices <- function(x, n_label = TRUE, sort = TRUE,
       els <- strsplit(x, array_separator)
     }
     
-    tab <- table(do.call(c, els))
+    if(is.list(els)){
+      els <- do.call(c, els)
+    }
+    
+    tab <- table(els)
+    
   }
   
   if(dim(tab) == 0)return(NULL)
@@ -125,13 +134,27 @@ vals
 # what = vector (OR)
 search_array <- function(x, what, array_separator = ";", array_comparison = c("all","any")){
   
-  lis <- strsplit(x, array_separator)
+  safe_from_json <- function(x){
+    if(is.na(x)){
+      NA_character_
+    } else {
+      jsonlite::fromJSON(x)
+    }
+  }
   
+  if(array_separator == "json"){
+    lis <- lapply(x, safe_from_json)
+  } else {
+    lis <- strsplit(x, array_separator)  
+  }
+  
+  # all, any, ...
   how <- base::get(match.arg(array_comparison))
   
   sapply(lis, function(el){
     how(what %in% el)
   })
+  
 }
 
 

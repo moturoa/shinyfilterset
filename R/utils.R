@@ -12,7 +12,15 @@ is.Tag <- function(x){
 get_unique <- function(x, sort = TRUE, array_field = FALSE, array_separator = ";"){
   
   if(array_field){
-    out <- unique(do.call(c, strsplit(x, array_separator)))  
+    
+    if(array_separator == "json"){
+      els <- sapply(x, jsonlite::fromJSON, USE.NAMES = FALSE)
+    } else {
+      els <- strsplit(x, array_separator)
+    }
+
+    out <- unique(do.call(c, els))  
+    
   } else {
     out <- unique(x)
   }
@@ -72,7 +80,14 @@ make_choices <- function(x, n_label = TRUE, sort = TRUE,
   if(!array_field){
     tab <- table(x)  
   } else {
-    tab <- table(do.call(c, strsplit(x, array_separator)))
+    
+    if(array_separator == "json"){
+      els <- sapply(x, jsonlite::fromJSON, USE.NAMES = FALSE)
+    } else {
+      els <- strsplit(x, array_separator)
+    }
+    
+    tab <- table(do.call(c, els))
   }
   
   if(dim(tab) == 0)return(NULL)

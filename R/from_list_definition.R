@@ -77,6 +77,7 @@ from_list_definition <- function(lis, ...){
                 updates = m_get("updates", FALSE),
                 ui_section = m_get("section", 1),
                 array_field = m_get("array", FALSE),
+                array_separator = m_get("array_separator", ";"),
                 pass_na = m_get("pass_na", TRUE),
                 select_choices = m_get("choices", NULL),
                 static = m_get("static", FALSE),

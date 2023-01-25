@@ -148,12 +148,14 @@ DataFilterSet <- R6::R6Class(
       
     },
     
-    apply = function(data, columns = NULL){
+    apply = function(data, columns = NULL,
+                     columns_exclude = NULL){
       
       out <- callModule(private$filter_server, 
                         id = self$id,
                         data = data,
-                        columns = columns)
+                        columns = columns,
+                        columns_exclude = columns_exclude)
       
       self$update(out$data)
       
@@ -243,7 +245,8 @@ DataFilterSet <- R6::R6Class(
       
     },
     
-  filter_server = function(input, output, session, data, columns = NULL){
+  filter_server = function(input, output, session, data, 
+                           columns = NULL, columns_exclude = NULL){
       
       nms <- names(self$filters)
       empt <- c()
@@ -251,6 +254,8 @@ DataFilterSet <- R6::R6Class(
       if(!is.null(columns)){
         nms <- intersect(columns, nms)
       }
+      
+      nms <- setdiff(nms, columns_exclude)
       
       for(i in seq_along(nms)){
         

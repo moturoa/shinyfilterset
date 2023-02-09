@@ -97,38 +97,36 @@ make_choices <- function(x, n_label = TRUE, sort = TRUE,
     
   }
   
-  if(n_label){
-    if(is.null(select_choices)){
-      
-      if(!array_field){
-        tab <- table(x)  
-      } else {
-        
-        if(array_separator == "json"){
-          
-          i_v <- vapply(x, function(x)!all(is.na(x)), FUN.VALUE = logical(1))
-          z <- x[i_v]
-          els <- sapply(unique(unname(z)), jsonlite::fromJSON, USE.NAMES = FALSE)
-          
-        } else {
-          els <- strsplit(x, array_separator)
-        }
-        
-        if(is.list(els)){
-          els <- do.call(c, els)
-        }
-        
-        tab <- table(els)
-        
-      }
-      
-      
-      names(vals) <- paste0(vals, " (",tab,")")    
-      
-    } else {
-      #warning("n_label not used when select choices passed - buggy for now") 
-    }
-  }
+  # if(n_label){
+  #   if(is.null(select_choices)){
+  #     
+  #     if(!array_field){
+  #       tab <- table(x)  
+  #     } else {
+  #       
+  #       if(array_separator == "json"){
+  #         
+  #         i_v <- vapply(x, function(x)!all(is.na(x)), FUN.VALUE = logical(1))
+  #         z <- x[i_v]
+  #         els <- sapply(unique(unname(z)), jsonlite::fromJSON, USE.NAMES = FALSE)
+  #         
+  #       } else {
+  #         els <- strsplit(x, array_separator)
+  #       }
+  #       
+  #       if(is.list(els)){
+  #         els <- do.call(c, els)
+  #       }
+  #       
+  #       tab <- table(els)
+  #       
+  #     }
+  #     names(vals) <- paste0(vals, " (",tab,")")    
+  #     
+  #   } else {
+  #     #warning("n_label not used when select choices passed - buggy for now") 
+  #   }
+  # }
   
   if(array_field && !is.null(selected)){
     vals <- vals[which(vals %in% selected)]

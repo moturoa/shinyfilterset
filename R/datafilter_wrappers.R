@@ -33,7 +33,7 @@ shinyfilterset <- function(...,
   
   DataFilterSet$new(..., 
                     data = data, 
-                    id = "shinyfilterset", 
+                    id = id, 
                     updates = updates, 
                     updates_on_last_use = updates_on_last_use,
                     n_label = n_label,
@@ -113,8 +113,7 @@ data_filter <- function(column_name,
   search_method <- match.arg(search_method)
   
   if(is.null(id)){
-    id <- paste0("col-",column_name)
-      #uuid::UUIDgenerate()
+    id <- uuid::UUIDgenerate()
   }
 
    

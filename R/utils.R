@@ -7,6 +7,22 @@ is.Tag <- function(x){
 }
 
 
+# Vectorized from_json, passes NA and stuff we cannot convert
+# Specifically we might have normal chars "text" in between real JSON ["a","b"]
+from_json <- function(x){
+    
+  lapply(x, 
+         function(x){
+           tryCatch(
+             jsonlite::fromJSON(x),
+             error = function(e)x
+           )  
+         }
+         )
+  
+}
+
+#from_json(c(NA,"a",'["a","b"]'))
 
 
 get_unique <- function(x, sort = TRUE, array_field = FALSE, array_separator = ";"){
@@ -16,7 +32,7 @@ get_unique <- function(x, sort = TRUE, array_field = FALSE, array_separator = ";
     if(array_separator == "json"){
       i_v <- vapply(x, function(x)!all(is.na(x)), FUN.VALUE = logical(1))
       z <- x[i_v]
-      els <- sapply(unique(unname(z)), jsonlite::fromJSON, USE.NAMES = FALSE)
+      els <- from_json(unique(unname(z)))
     } else {
       els <- strsplit(x, array_separator)
     }
@@ -139,16 +155,8 @@ vals
 # what = vector (OR)
 search_array <- function(x, what, array_separator = ";", array_comparison = c("all","any")){
   
-  safe_from_json <- function(x){
-    if(is.na(x)){
-      NA_character_
-    } else {
-      jsonlite::fromJSON(x)
-    }
-  }
-  
   if(array_separator == "json"){
-    lis <- lapply(x, safe_from_json)
+    lis <- from_json(x)
   } else {
     lis <- strsplit(x, array_separator)  
   }

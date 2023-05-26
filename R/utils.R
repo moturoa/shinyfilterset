@@ -30,7 +30,7 @@ get_unique <- function(x, sort = TRUE, array_field = FALSE, array_separator = ";
   if(array_field){
     
     if(array_separator == "json"){
-      i_v <- vapply(x, function(x)!all(is.na(x)), FUN.VALUE = logical(1))
+      i_v <- vapply(x, function(x)!all(is.na(x) | x %in% c("{}","[]")), FUN.VALUE = logical(1))
       z <- x[i_v]
       els <- from_json(unique(unname(z)))
     } else {

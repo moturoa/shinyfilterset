@@ -17,6 +17,10 @@ cereals$boolean <- sample(c(TRUE,FALSE), nrow(cereals), replace = TRUE)
 
 cereals$naam <- replicate(nrow(cereals),paste(sample(letters,5), collapse=""))
 
+cereals$year <- sample(2000:2020, nrow(cereals), replace = TRUE)
+
+cereals$float <- runif(nrow(cereals),100,200)
+
 library(shintoshiny)
 
 .def <- yaml::read_yaml("test/cereal_filters.yml")$filters
@@ -66,7 +70,7 @@ server <- function(input, output, session) {
   data_filtered <- reactive({
     
     req(ui_done())
-    print("filtering")
+    print(glue::glue("[{Sys.time()}] filtering"))
     cereal_filters$apply(cereals)
     
   })

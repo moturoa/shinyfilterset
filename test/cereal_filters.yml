@@ -22,11 +22,22 @@ filters:
         "Aardbei" : "A"
   protein:
     section: 1
-    ui: "select"
+    ui: "numeric_range"
     label: "Eiwit"
     tooltip: "g per g eiwit"
-    updates: true
-    choices: [6,2,3,4,5,1]
+    static: true
+    value: ["<<value_min>>","<<value_max>>"]
+  float:
+    section: 1
+    ui: "numeric_range"
+    label: "Getal"
+    static: true
+  year:
+    section: 1
+    ui: "numeric_range"
+    label: "Jaar"
+    static: true
+    value: ["<<this_year>>","<<value_max>>"]
   datum_wijziging:
     section: 1
     ui: "date_range"
@@ -36,7 +47,7 @@ filters:
     section: 1
     ui: "numeric_range"
     label: "Sodium"
-    updates: true
+    static: true
     tooltip: "sodium tooltip"
   boolean:
     section: 2

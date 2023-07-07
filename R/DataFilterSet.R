@@ -56,7 +56,7 @@ DataFilterSet <- R6::R6Class(
         # R6 class constructed with data_filter()
         obj <- self$filters[[i]]
         
-        if(obj$static){
+        if(FALSE){  #obj$static){
           
           column_data <- NA
           .range <- NA
@@ -98,7 +98,6 @@ DataFilterSet <- R6::R6Class(
         
         self$filters[[i]]$set("range", .range)
         self$filters[[i]]$set("unique", .unique)
-        
         
         # Apply extra arguments
         if(!is.null(self$updates)){

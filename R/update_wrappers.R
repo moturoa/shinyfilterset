@@ -110,8 +110,7 @@ update_range <- function(session, id, self, data, input){
     val <- c(floor_digits(val[1], self$round_digits), 
              ceiling_digits(val[2], self$round_digits))
   
-    # !! apparently updateNumericRangeInput has a bug that we have to re-set the label.
-    shinyWidgets::updateNumericRangeInput(session, id, value = val)  #label = self$label, 
+    shinyWidgets::updateNumericRangeInput(session, id, value = val)
   }
 }
 

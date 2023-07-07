@@ -42,7 +42,21 @@ numericrange_input <- function(id, self){
     options$value <- c(floor_digits(self$range[1], self$round_digits), 
                        ceiling_digits(self$range[2], self$round_digits))
 
+  } else {
+    
+    if("<<this_year>>" %in% options$value){
+      options$value[options$value == "<<this_year>>"] <- 1900 + as.POSIXlt(Sys.Date())$year
+    }
+    if("<<value_max>>" %in% options$value){
+      options$value[options$value == "<<value_max>>"] <- ceiling_digits(self$range[2], self$round_digits)
+    }
+    if("<<value_min>>" %in% options$value){
+      options$value[options$value == "<<value_min>>"] <- floor_digits(self$range[1], self$round_digits)
+    }
+    options$value <- as.numeric(options$value)
+    
   }
+  
   options$label <- self$label
 
   options <- c(list(inputId = id), options)

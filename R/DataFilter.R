@@ -1,42 +1,13 @@
 # Class definition: a single filter.
-DataFilter <- R6Class(
-  "DataFilter",
+DataFilter <- R6::R6Class(
+  lock_objects = FALSE,
+  classname = "DataFilter",
+  
   public = list(
     
-    id = NULL,
-    ui_section = NULL,
-    column_name = NULL,
-    updates = NULL,
-    updates_on_last_use = NULL,
-    all_choice = NULL,
-    search_method = NULL,
-    label = NULL,
-    unique = NULL,
-    range = NULL,
-    filter_ui = NULL,
-    filter_function = NULL,
-    static = NULL,
-    options = NULL,
-    #input_function = NULL,
-    update_function = NULL,
-    set_function = NULL,
-    value_initial = NULL,
-    n_label = NULL,
-    sort = NULL,
-    pass_na = NULL,
-    array_field = NULL,
-    array_separator = NULL,
-    array_comparison = NULL,
-    server = NULL,
-    round_digits = NULL,
-    n_updates = 0,
-    select_choices = NULL,
-    
-    # DataFilter$new()
     initialize = function(id, 
                           label = NULL,
                           ui_section = NULL,
-                          #column_data = NULL, 
                           column_name, 
                           filter_ui,
                           updates = NULL,
@@ -82,7 +53,8 @@ DataFilter <- R6Class(
       
       # Completely static filter: no init, no update of options / ranges.
       self$static <- static
-      if(self$static){
+      
+      if(isTRUE(self$static)){
         self$updates <- FALSE
       }
       
@@ -135,8 +107,9 @@ DataFilter <- R6Class(
       
       is_last <- isTRUE(!is.null(last_filter) && last_filter == self$column_name)
       
-      if(!self$static){
-        if(self$n_updates == 0 | (self$updates & !(is_last & !self$updates_on_last_use))){
+      if(!isTRUE(self$static)){
+        
+        if(isTRUE(self$n_updates == 0) | (isTRUE(self$updates) & !(is_last & !isTRUE(self$updates_on_last_use)))){
           
           #print(paste(self$n_updates, "updating", self$column_name))
           
@@ -153,7 +126,9 @@ DataFilter <- R6Class(
             )
             self$n_updates <- self$n_updates + 1
           }
-        } 
+        }
+        
+        
       }
       
     },

@@ -15,6 +15,7 @@ DataFilterSet <- R6::R6Class(
     history = c(),
     ns = NS(NULL),
     all_data_on_null = NULL,
+    ui_generated = FALSE,
     last_filter = "",
     initialize = function(..., 
                           data, 
@@ -112,11 +113,14 @@ DataFilterSet <- R6::R6Class(
       }
       
     },
+    
     ui = function(ns = NS(NULL), section = NULL, horizontal = FALSE){
       
       ns <- NS(ns(self$id))
       
       self$history <- c()
+      
+      self$ui_generated <- TRUE
       
       tags$div(id = ns(self$id),
                lapply(self$elements, function(x){

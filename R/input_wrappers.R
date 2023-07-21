@@ -193,6 +193,10 @@ date_range_input <- function(id, self){
     options$end <- self$range[2]
   }
   
+  options$language <- "nl"
+  options$format <- "dd-mm-yyyy"
+  options$separator <- "tot"
+  
   list(ui = do.call(shiny::dateRangeInput, options),
        value = c(options$start, options$end))
   

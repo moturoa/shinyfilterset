@@ -189,9 +189,32 @@ date_range_input <- function(id, self){
   options <- c(list(inputId = id), options)
   
   if(!("start" %in% names(options))){
-    options$start <- self$range[1]
-    options$end <- self$range[2]
+    
+    if(!("value" %in% names(options))){
+      options$start <- self$range[1]
+      options$end <- self$range[2]  
+    } else {
+      
+      if("<<this_date>>" %in% options$value){
+        options$value[options$value == "<<this_date>>"] <- format(Sys.Date())
+      }
+      if("<<value_min>>" %in% options$value){
+        options$value[options$value == "<<value_min>>"] <- format(self$range[1])
+      }
+      if("<<value_max>>" %in% options$value){
+        options$value[options$value == "<<value_max>>"] <- format(self$range[2])
+      }
+      options$start <- options$value[1]
+      options$end <- options$value[2]
+      options$value <- NULL
+    }
+    
+    
   }
+  
+  
+  
+  
   
   options$language <- "nl"
   options$format <- "dd-mm-yyyy"

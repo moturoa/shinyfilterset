@@ -19,8 +19,7 @@ apply_filter <- function(data, value, object){
       return(data)
     }
     
-    if(object$filter_ui %in% c("slider","numeric_range","date_range")){
-      
+    if(object$filter_ui %in% c("slider","numeric_range")){
       if(!object$pass_na){
         data <- dplyr::filter(data,
                               between(!!sym(colname), value[1], value[2]))  
@@ -29,6 +28,20 @@ apply_filter <- function(data, value, object){
         data <- dplyr::filter(data, 
                               is.na(!!sym(colname)) | 
                                 between(!!sym(colname), value[1], value[2]))  
+        
+      }
+      
+    }
+    
+    if(object$filter_ui %in% c("date_range")){
+      if(!object$pass_na){
+        data <- dplyr::filter(data,
+                              between(!!sym(colname), as_datetime(glue("{value[1]} 00:00:00")), as_datetime(glue("{value[1]} 23:59:59"))))  
+      } else {
+        
+        data <- dplyr::filter(data, 
+                              is.na(!!sym(colname)) | 
+                                between(!!sym(colname), as_datetime(glue("{value[1]} 00:00:00")), as_datetime(glue("{value[1]} 23:59:59"))))  
         
       }
       

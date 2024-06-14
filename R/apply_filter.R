@@ -36,12 +36,12 @@ apply_filter <- function(data, value, object){
     if(object$filter_ui %in% c("date_range")){
       if(!object$pass_na){
         data <- dplyr::filter(data,
-                              between(!!sym(colname), as_datetime(glue("{value[1]} 00:00:00")), as_datetime(glue("{value[1]} 23:59:59"))))  
+                              between(!!sym(colname), as_datetime(glue("{value[1]} 00:00:00")), as_datetime(glue("{value[2]} 23:59:59"))))  
       } else {
         
         data <- dplyr::filter(data, 
                               is.na(!!sym(colname)) | 
-                                between(!!sym(colname), as_datetime(glue("{value[1]} 00:00:00")), as_datetime(glue("{value[1]} 23:59:59"))))  
+                                between(!!sym(colname), as_datetime(glue("{value[1]} 00:00:00")), as_datetime(glue("{value[2]} 23:59:59"))))  
         
       }
       

@@ -71,7 +71,7 @@ remotes::install_bitbucket("shintolabs/shinyfilterset", auth_user = "YOU", passw
 
 ## Contact
 
-Remko Duursma
+Wesley Brants
 
 
 
